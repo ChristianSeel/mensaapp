@@ -333,7 +333,7 @@ function getMenu(mensaid, datestamp, redirect){
 					for (var j=0; j<foodplan.meals.length; j++){
 						var meal = foodplan.meals[j];
 
-						DEBUG_MODE && console.log(meal);
+						//DEBUG_MODE && console.log(meal);
 						if (typeof meal.recommendations == "undefined") meal.recommendations = 0;
 						meal.recommendations = Math.round(Math.random() * (100 - 1)) + 1;
 

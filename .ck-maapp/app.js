@@ -397,6 +397,7 @@ function onLogin(){
 }
 
 
+
 function getKontoTpl(){
 	var pluralE = "e";
 	if (fbuser.numberofcoupons == 1) pluralE = "";
@@ -512,9 +513,11 @@ function api(url, success, fail) {
 		return false;
 	}
 	
-	DEBUG_MODE && console.log("api request: "+url);
+	
 	
 	if (url.indexOf("?") == -1) url += "?";
+	url += "&ma_hash="+hash.gen();
+	DEBUG_MODE && console.log("api request: "+url);
 	url += "&enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion;
 	
 	
@@ -524,6 +527,8 @@ function api(url, success, fail) {
 			timeout: 40000,
 			success: function(response){
 			
+				if (DEBUG_MODE && response.debug) console.log("Debug response: "+response.debug);
+				
 				if (response.error) {
 					fail(response);
 				} else {
