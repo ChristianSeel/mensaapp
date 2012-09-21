@@ -221,7 +221,6 @@ $(function(){
 		fbLogout();
 	});
 	
-console.log("es ist 01:17 uhr");
 
 
 	
@@ -229,7 +228,7 @@ console.log("es ist 01:17 uhr");
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
 		console.log("go to speiseplan "+mensaid);
-		getMenu(mensaid, getDatestamp());
+		getMenu(mensaid, getDatestamp(), true);
 		jQT.goTo("#speiseplan","slideleft");
 		return false;
 	});
@@ -253,28 +252,6 @@ console.log("es ist 01:17 uhr");
 	
 	
 		
-/*	
-	// mark mensa as favorite
-	$('.mensa .addFavorite').live(clickEvent,function(e) {
-	    if ($(this).hasClass('isfavorite') === true) {
-		    // remove from favorites
-		    if (removeMensaFromFavorite($(this).parent('.mensa[data-mensaid]').data('mensaid')) === true) $(this).removeClass('isfavorite');
-	    } else {
-		    // add to favorites
-		    if (addMensaToFavorite($(this).parent('.mensa[data-mensaid]').data('mensaid')) === true) $(this).addClass('isfavorite');
-		}
-	});
-	
-	
-	$('.mensa').live(clickEvent,function(e) {
-		
-		var mensaid = $(this).data('mensaid');
-		console.log("go to speiseplan "+mensaid);
-		jQT.goTo("#speiseplan");
-		return;
-	});
-*/	
-	
 	
 	
 

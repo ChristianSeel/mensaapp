@@ -350,7 +350,8 @@ function getMenu(mensaid, datestamp, redirect){
 			
 		if (found === false) {
 			DEBUG_MODE && console.log("no meals returned by api");
-			
+
+			if (redirect === true) setTimeout(jQT.goBack, 500);
 			$('#busy').fadeOut();
 			navigator.notification.alert(
 			    "Keine Speiseplan-Daten gefunden.",  // message
@@ -359,7 +360,7 @@ function getMenu(mensaid, datestamp, redirect){
 			    'OK'                  // buttonName
 			);
 			
-			if (redirect === true) jQT.goBack();
+			
 			
 			return false;
 		}
@@ -389,10 +390,10 @@ function getMenu(mensaid, datestamp, redirect){
 function mealListTpl(data){
 	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'">
 				<div class="innerwrapper">
-				<h2>'+data.name+'</h2>
-				<p>';
-	if (typeof data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span><br>';
-	
+				<h2>'+data.name+' </h2>
+				';
+	if (typeof data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span>';
+	tpl += '<p>';
 	if (typeof data.price !== "undefined") {
 		tpl += '<span class="price">';
 			for (p in data.price) {
@@ -402,14 +403,14 @@ function mealListTpl(data){
 		tpl +='</span><br>';
 	}
 	
-	if (data.info !== "undefined") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
+	if (typeof data.info !== "undefined") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
 	
 	tpl = tpl.substr(0, tpl.length -4);
 	
 	tpl += '
 					</p>
-					<p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p>
 				</div>
+				<p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p>
 			</div>
 			';
 	
