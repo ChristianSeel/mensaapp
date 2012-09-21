@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta charset="utf-8">
+		<meta name = "format-detection" content = "telephone=no" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+		
+		<title>mensa.app</title>
+
+		<link rel="stylesheet" href="css/jqtouch.css" />
+		<link rel="stylesheet" href="css/fontface.css" />
+		<link rel="stylesheet" href="css/maapp.css" />
+		
+	<!-- JAVASCRIPT -->	
+		<!-- Cordova -->
+		<script type="text/javascript" src="cordova-2.1.0rc2.js"></script>
+		
+		<!-- facebook connect -->
+		<script type="text/javascript" src="cdv-plugin-fb-connect.js"></script>
+		<script type="text/javascript" src="facebook_js_sdk.js"></script>
+		
+		<!-- GoogleAnalyticsPlugin -->
+		<!-- iOS  --><script type="text/javascript" src="GoogleAnalyticsPlugin.js"></script>
+		<!-- Android <script type="text/javascript" src="analytics.js"></script>-->
+				
+		<!-- jQuery -->
+		<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+		
+		<!-- jQTouch -->
+		<script type="text/javascript">var disableNavigation = false;</script>
+		<script type="text/javascript" src="js/jqtouch.js"></script>
+		<script type="text/javascript" src="js/jqtouch-jquery.js"></script>
+		
+		<!-- iScroll -->
+		<script type="text/javascript" src="js/iscroll.js"></script>
+		<script type="text/javascript" src="js/jqt.iscroll.js"></script>
+		
+		<!-- Fastclick -->
+		<script type="text/javascript" src="js/fastclick.js"></script>
+		
+		<!-- App -->
+		<script type="text/javascript" src="js/q.js"></script>
+		<script type="text/javascript" src="js/db.min.js"></script>
+		<script type="text/javascript" src="js/app.min.js"></script>
+		
+		<script type="text/javascript">
+			
+			var DEBUG_MODE = true;
+			var appversion = "0.0.2";
+			var requiredDBVersion = 5;
+			
+			var base_url = "http://mensaapp.de/";
+			var static_url = "http://static.mensaapp.de/";
+			var api_url = "http://api.mensaapp.de/";
+						
+			var fbAppId = "385420104813730";
+			var fbAppName = "mensa.app";
+			var fbAppScope = "email,publish_stream,publish_actions";
+			
+			var fbKontoName = "Facebook-Konto";
+			
+			var fbuser = false;
+			var fbaccessToken = "";	
+				
+			var networkConnection;
+			var networkState = 0;
+			var db, googleAnalytics, uuid;
+			var devicePlatform = false;
+			
+			var clickEvent = 'click';
+			
+			// prevent dragging in cordova
+			function preventBehavior(e) {
+				e.preventDefault();
+			}
+			document.addEventListener("touchmove", preventBehavior, false);
+			
+			app.initialize();
+			
+			var jQT = new $.jQTouch({
+				cacheGetRequests: false,
+				debug: false,
+				defaultAnimation: 'slideleft',
+				useAnimations: true,
+				useFastTouch: false,
+				useTouchScroll: false,
+				initializeTouch: '.touch',
+				slideSelector: '.slideleft, .slide, #jqt > * > ul.slide li a, #jqt > * > ul li.slide a',
+				preloadImages: []
+			});
+			
+			document.getElementById('appversion').innerHTML = appversion;
+			document.getElementById('splashappversion').innerHTML = "v"+appversion;
+		</script>
+		
+		
+	</head>
+	<body>
+
+		<div id="fb-root"></div>
+		<div id="splashscreen"><div class="spinner"></div><span id="splashappversion"></span></div>
+		<div id="busy"><div class="wrapper"><div class="spinner"></div><span>Bitte warten...</span></div></div>
+		
+		<div id="tabbar">
+			<ul>
+				<li>
+					<a data-href="#mensen" class="icon-mensen">
+						Mensen
+					</a>
+				</li>
+				
+				<li class="bigger">
+					<a data-href="#speiseplan" class="icon-speiseplan">
+						Speiseplan
+					</a>
+				</li>
+				
+				<li>
+					<a data-href="#konto" class="icon-konto">
+						Konto
+					</a>
+				</li>
+			</ul>
+		</div>
+		
+		
+		<div id="header">
+			<div class="wrapper">
+				<h1 id="logo"></h1>
+				<a class="infoIcon" href="#imprint">Info</a>
+			</div>
+		</div>
+		
+		<div id="headerleiste"></div>
+		
+		
+		
+		
+		<div id="jqt">
+			
+			
+			
+			<div id="mensen" class="current">
+			
+				<div class="navigationbar">
+					<h1>Mensen in deiner Nähe</h1>
+				</div>
+				
+				<div class="scrollwrapper">
+					<div class="content scrollpanel">
+											
+					
+					</div>
+				</div>
+			</div> <!-- mensen -->
+
+
+
+			
+			
+			
+			<div id="speiseplan">
+			
+				<div class="navigationbar">
+					<h1>Speiseplan</h1>
+				</div>
+				
+				<div class="scrollwrapper">
+					<div class="content scrollpanel">
+											
+					
+					</div>
+				</div>
+			</div> <!-- speseiplan -->
+
+
+
+			
+
+			
+			
+			
+			
+			
+
+
+			<div id="konto">
+				<div class="navigationbar">
+					<h1>WZ-Konto</h1>
+					<a class="refreshIcon" href="#" style="display:none;">Neu laden</a>
+				</div>
+				
+				<div class="scrollwrapper">
+					<div class="content scrollpanel">
+					
+						<div class="offline">
+							
+							<a href="#" id="fblogin" class="bold bluebutton icon">Login via Facebook</a>
+							
+							<div class="span">
+							
+								<h2 class="text-center">Punkte sammeln und <nobr>Gutscheine kassieren!</nobr></h2>
+								
+								
+								<p>Wir belohnen dich für deine Aktivität auf Facebook! Mit dem WZ-Konto erhältst du für verschiedene Aktivitäten auf Facebook Punkte, die du dann später gegen Gutscheine für die Wilde-Zicke eintauschen kannst.</p>	
+									
+							</div>
+														
+							<a href="http://wilde-zicke.de/konto/" target="_blank" class="bold graybutton">Mehr Infos zum WZ-Konto</a>
+													
+							
+						</div>
+						
+						<div class="online" style="display:none;"></div>
+						
+								
+					</div>
+				</div>
+			</div> <!-- konto -->
+			
+			
+			
+			<div id="imprint">
+			
+				<div class="navigationbar">
+					<h1>Impressum</h1>
+				</div>
+				
+				<div class="scrollwrapper">
+					<div class="content scrollpanel">
+						
+						<div class="span1">
+							<h2 class="text-center">mensa.app</h2>
+							<p class="text-center">Version <span id="appversion">X</span></p>
+						</div>
+						
+						<a href="mailto:tech-support@wilde-zicke.de" class="bold graybutton">Feedback senden</a>
+						
+						<div class="span1">
+							<h2>Impressum</h2>
+							<p><strong>mensa.app</strong><br>
+							
+						</div>
+							
+						<div class="span1">
+							<h2>Gestaltung & Entwicklung</h2>
+							<p class="text-center"><img src="img/Logo-chsmedien.png" style="max-width:230px;padding-top: 5px" /></p>
+							<p class="text-center"><a href="http://www.chsmedien.de" target="_blank">www.chsmedien.de</a></p>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+			
+
+
+			
+		</div> <!-- #jqt -->
+		
+	</body>
+</html>
