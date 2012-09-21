@@ -1,5 +1,11 @@
 var dbCreated = false;
 
+/*
+ *
+ * init cache database
+ *
+ */
+
 function initDB(){
 	// open database
 	db = window.openDatabase("mensaappcache", "1.0", "App Cache", 5 * 1024 * 1024);
@@ -51,6 +57,7 @@ function createDBTables(tx) {
 
 function dropDBTables(tx) {
 	//tx.executeSql('DROP TABLE IF EXISTS Settings'); DO NOT DROP Settings, since there are some user values!
+	// todo: backup favorite mensen!
 	tx.executeSql('DROP TABLE IF EXISTS Mensen');
 	tx.executeSql('DROP TABLE IF EXISTS Meals');
 	DEBUG_MODE && console.log("[DB] db tables droped.");
@@ -62,6 +69,7 @@ function dropDBTables(tx) {
 /*
  *
  * Check DB version
+ * checks stored db version value - used for changes on db scheme
  *
  */
 function getDBversion(tx) {
@@ -154,6 +162,8 @@ function getMensenFromApi(cb) {
 					tx.executeSql('INSERT OR IGNORE INTO Mensen (mensaid) VALUES ('+mensa.mensaid+')');
 					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, city=?, lastcheck=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.city, mensa.lastcheck, mensa.coord.lon, mensa.coord.lat]);
 				}
+				
+				tx.executeSql('UPDATE Settings SET val=? WHERE key="lastupdate"', [getTimestamp()]);
 				
 			}, dbError, function(){
 				//success
@@ -291,40 +301,11 @@ function mensenListTpl(data){
 	return tpl;
 }
 
-function getSingleMensa(mensaid){
-	
-	// db request
-	db.transaction(function(tx){
-		tx.executeSql('SELECT * FROM Mensen WHERE mensaid = '+mensaid , [],
-			function(tx, results) {
-			// success function
-			
-				var len = results.rows.length;
-				
-				if (len == 0) {
-					getMealsFromApi(mensaid);
-					return;
-				}
-				
-				var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
-				
-				speiseplan.prepend(mealListTpl(meal));
-				
-				for (var i=0; i<len; i++){
-					meal = results.rows.item(i);
-					speiseplan.append(mealListTpl(meal));
-			    }
-				
-				
-				
-			}, dbError);
-	}, dbError);
-}
 
 
 
 
-/*
+
 
 function getMenu(mensaid, datestamp){
 	
@@ -454,7 +435,7 @@ function mealListTpl(data){
 }
 
 
-*/
+
 
 
 
