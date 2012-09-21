@@ -304,9 +304,121 @@ function mensenListTpl(data){
 
 
 
+function getMenu(mensaid, datestamp, redirect){
+	
+	$('#busy').fadeIn();
+	
+	var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
+	
+	api('getmeals?mensaid='+mensaid, function(results){
+		//success
+		//DEBUG_MODE && console.log(results);
+		var days = results.days.length;
+		
+			var found = false;
+			for (var i=0; i<results.days.length; i++){
+				var foodplan = results.days[i];
+				
+				if (foodplan.datestamp == datestamp) {
+					found = true;
+					$('#speiseplan .navigationbar h1').html(foodplan.label);
+					
+					$('#speiseplan .content').prepend('
+						<div class="square"><div class="innerwrapper">
+							<h3>'+results.mensa.name+'</h3>
+							<p><span class="bold">'+results.mensa.org+'</span><br>Letzte Aktualisierung: '+results.mensa.lastcheck+'</p>
+						</div></div>
+					');
+					
+					for (var j=0; j<foodplan.meals.length; j++){
+						var meal = foodplan.meals[j];
+
+						DEBUG_MODE && console.log(meal);
+						if (typeof meal.recommendations == "undefined") meal.recommendations = 0;
+						meal.recommendations = Math.round(Math.random() * (100 - 1)) + 1;
+
+						speiseplan.append(mealListTpl(meal));
+						
+						if (j == foodplan.meals.length-1) { // last loop
+							$('#busy').fadeOut();
+						}
+					}
+				break;
+				}
+				
+			}
+			
+		if (found === false) {
+			DEBUG_MODE && console.log("no meals returned by api");
+			
+			$('#busy').fadeOut();
+			navigator.notification.alert(
+			    "Keine Speiseplan-Daten gefunden.",  // message
+			    alertDismissed,         // callback
+			    "Fehler",            // title
+			    'OK'                  // buttonName
+			);
+			
+			if (redirect === true) jQT.goBack();
+			
+			return false;
+		}
+	  
+	}, function(results){
+		//fail
+		DEBUG_MODE && console.log("meals update failed");
+		DEBUG_MODE && console.log(results);
+		$('#busy').fadeOut();
+		
+		if (results.error.title) {var title = results.error.title + "";} else {var title = "Fehler";}
+		if (results.error.description) {var msg = results.error.description + "";} else {var msg = "Es ist ein unbekannter Fehler aufgetreten.";}
+		
+		navigator.notification.alert(
+		    msg,  // message
+		    alertDismissed,         // callback
+		    title,            // title
+		    'OK'                  // buttonName
+		);
+		
+	});
+
+
+}
+
+
+function mealListTpl(data){
+	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'">
+				<div class="innerwrapper">
+				<h2>'+data.name+'</h2>
+				<p>';
+	if (typeof data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span><br>';
+	
+	if (typeof data.price !== "undefined") {
+		tpl += '<span class="price">';
+			for (p in data.price) {
+				tpl += p + ': '+ data.price[p] + ' | ';
+			}
+			tpl = tpl.substr(0, tpl.length -3);
+		tpl +='</span><br>';
+	}
+	
+	if (data.info !== "undefined") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
+	
+	tpl = tpl.substr(0, tpl.length -4);
+	
+	tpl += '
+					</p>
+					<p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p>
+				</div>
+			</div>
+			';
+	
+	return tpl;
+}
 
 
 
+/*
 function getMenu(mensaid, datestamp){
 	
 	$('#busy').fadeIn('fast');
@@ -403,36 +515,10 @@ function getMealsFromApi(mensaid){
 	});
 		
 }
+*/
 
-function mealListTpl(data){
-	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'">
-				<div class="innerwrapper">
-				<h3>'+data.name+'</h3>
-				<p>';
-	if (data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span><br>';
-	
-	if (data.price !== "undefined") {
-		data.price = jQuery.parseJSON(data.price);
-		tpl += '<span class="price">';
-			for (p in data.price) {
-				tpl += p + ': '+ data.price[p] + ' | ';
-			}
-			tpl = tpl.substr(0, tpl.length -3);
-		tpl +='</span><br>';
-	}
-	
-	if (data.info !== "undefined") tpl += '<span class="info">'+data.info+'</span><br>';
-	
-	tpl = tpl.substr(0, tpl.length -4);
-	
-	tpl += '
-					</p>
-				</div>
-			</div>
-			';
-	
-	return tpl;
-}
+
+
 
 
 
