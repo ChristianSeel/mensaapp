@@ -516,9 +516,8 @@ function api(url, success, fail) {
 	
 	
 	if (url.indexOf("?") == -1) url += "?";
-	url += "&ma_hash="+hash.gen();
-	DEBUG_MODE && console.log("api request: "+url);
-	url += "&enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion;
+	url += "&ma_hash="+hash.gen("enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion);
+	DEBUG_MODE && console.log("api request: "+url);	
 	
 	
 	$.getJSONP({
