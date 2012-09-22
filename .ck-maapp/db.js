@@ -304,7 +304,7 @@ function mensenListTpl(data){
 
 
 
-function getMenu(mensaid, datestamp, redirect){
+/*function getMenu(mensaid, datestamp, redirect){
 	
 	$('#busy').fadeIn();
 	
@@ -384,7 +384,7 @@ function getMenu(mensaid, datestamp, redirect){
 	});
 
 
-}
+}*/
 
 
 function mealListTpl(data){
@@ -419,106 +419,111 @@ function mealListTpl(data){
 
 
 
-/*
-function getMenu(mensaid, datestamp){
-	
+
+
+function getMenu(mensaid, datestamp, fetchFromApi) {
+
+	if (fetchFromApi == undefined)
+		fetchFromApi = true;
+
 	$('#busy').fadeIn('fast');
-	console.log("reading meals of mensa "+mensaid);
-	
+	console.log("reading meals of mensa " + mensaid);
+
 	// db request
-	db.transaction(function(tx){
-		tx.executeSql('SELECT * FROM Meals WHERE mensaid = '+mensaid+' AND datestamp = "'+datestamp+'" ORDER BY recommendations DESC' , [],
-			function(tx, results) {
+	db.transaction(function(tx) {
+		tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC', [], function(tx, results) {
 			// success function
-			
-				var len = results.rows.length;
-				
-				if (len == 0) {
-					getMealsFromApi(mensaid);
+
+			var len = results.rows.length;
+
+			if (len == 0) {
+				if (fetchFromApi == true) {
+					getMealsFromApi(mensaid, datestamp);
 					return;
+				} else {
+					DEBUG_MODE && console.log("no meals returned by api");
+					$('#busy').fadeOut();
+					navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
+					alertDismissed, // callback
+					"Fehler", // title
+					'OK' // buttonName
+					);
 				}
-				
-				var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
-				
-				//speiseplan.prepend(mealListTpl(meal));
-				
-				for (var i=0; i<len; i++){
-					meal = results.rows.item(i);
-					speiseplan.append(mealListTpl(meal));
-					if(i == len-1) $('#busy').fadeOut();
-			    }
-			    
-				
-				
-				
-			}, dbError);
+			}
+
+			var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
+
+			//speiseplan.prepend(mealListTpl(meal));
+
+			for (var i = 0; i < len; i++) {
+				meal = results.rows.item(i);
+				speiseplan.append(mealListTpl(meal));
+				if (i == len - 1)
+					$('#busy').fadeOut();
+			}
+
+		}, dbError);
 	}, dbError);
 }
 
+function getMealsFromApi(mensaid, datestamp) {
 
-function getMealsFromApi(mensaid){
-	
-	api('getmeals?mensaid='+mensaid, function(results){
+	api('getmeals?mensaid=' + mensaid, function(results) {
 		//success
 		//DEBUG_MODE && console.log(results);
 		var days = results.days.length;
-		
-		if (days > 0) {
-			db.transaction(function(tx){
-				
-				for (var i=0; i<results.days.length; i++){
-					var foodplan = results.days[i];
-					
-					for (var j=0; j<foodplan.meals.length; j++){
-						var meal = foodplan.meals[j];
-						
-						if (typeof meal.price !== "undefined") meal.price = new String(meal.price);
-						if (typeof meal.recommendations == "undefined") meal.recommendations = 0;
-						meal.recommendations = (Math.random() * (100 - 1)) + 100;
-						tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES ('+meal.mealid+')');
-						tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid='+meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
-					}
+
+		db.transaction(function(tx) {
+
+			for (var i = 0; i < results.days.length; i++) {
+				var foodplan = results.days[i];
+
+				for (var j = 0; j < foodplan.meals.length; j++) {
+					var meal = foodplan.meals[j];
+
+					if ( typeof meal.price !== "undefined")
+						meal.price = new String(meal.price);
+					if ( typeof meal.recommendations == "undefined")
+						meal.recommendations = 0;
+					meal.recommendations = (Math.random() * (100 - 1)) + 100;
+					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
+					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
 				}
-				
-			}, dbError, function(){
-				//success
-				getMenu(mensaid); // endlosscheife wenn geforderten daten nicht in der api waren..
-				DEBUG_MODE && console.log("meals successfull updated");
-			});
-		} else {
-			DEBUG_MODE && console.log("no meals returned by api");
-			$('#busy').fadeOut();
-			navigator.notification.alert(
-			    "Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.",  // message
-			    alertDismissed,         // callback
-			    "Fehler",            // title
-			    'OK'                  // buttonName
-			);
-			return false;
-		}
-	  
-	}, function(results){
+			}
+
+		}, dbError, function() {
+			//success
+			getMenu(mensaid, datestamp, false);
+			// endlosscheife wenn geforderten daten nicht in der api waren..
+			DEBUG_MODE && console.log("meals successfull updated");
+		});
+
+	}, function(results) {
 		//fail
 		DEBUG_MODE && console.log("meals update failed");
 		DEBUG_MODE && console.log(results);
 		$('#busy').fadeOut();
-		
-		if (results.error.title) {var title = results.error.title + "";} else {var title = "Fehler";}
-		if (results.error.description) {var msg = results.error.description + "";} else {var msg = "Es ist ein unbekannter Fehler aufgetreten.";}
-		
-		navigator.notification.alert(
-		    msg,  // message
-		    alertDismissed,         // callback
-		    title,            // title
-		    'OK'                  // buttonName
+
+		if (results.error.title) {
+			var title = results.error.title + "";
+		} else {
+			var title = "Fehler";
+		}
+		if (results.error.description) {
+			var msg = results.error.description + "";
+		} else {
+			var msg = "Es ist ein unbekannter Fehler aufgetreten.";
+		}
+
+		navigator.notification.alert(msg, // message
+		alertDismissed, // callback
+		title, // title
+		'OK' // buttonName
 		);
-		
+
 	});
-		
+
 }
-*/
-
-
 
 
 
