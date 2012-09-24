@@ -71,6 +71,8 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") top left;back
 .mensa .addFavorite{display:block;position:absolute;top:0;left:0;width:35px;height:100%;background:transparent url("../img/icon-star.png") center center no-repeat;-webkit-background-size:21px;-moz-background-size:21px;-o-background-size:21px;-ms-background-size:21px;background-size:21px}
 .mensa .addFavorite.isfavorite{background-image:url("../img/icon-star-active.png")}
 .mensa .org{font-weight:600}
+.mensainfo .innerwrapper{padding-left:20px}
+.mensainfo:after{content:"";display:block;position:absolute;top:0;left:0;height:100%;width:6px;background:#78003c;-webkit-border-top-left-radius:4px;-webkit-border-bottom-left-radius:4px;-moz-border-radius-topleft:4px;-moz-border-radius-bottomleft:4px;border-top-left-radius:4px;border-bottom-left-radius:4px}
 .meal .info{font-style:italic}
 .meal .label{font-weight:600}
 .meal .recommendations{padding:4px 15px;background:#ddd}

@@ -371,33 +371,6 @@ function mensenListTpl(data){
 }*/
 
 
-function mealListTpl(data){
-	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
-	
-	if (data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
-	
-	tpl += '<h2>'+data.name+' </h2><p>';
-	
-	
-	if (data.price !== "undefined" && data.price !== "") {
-		var price = jQuery.parseJSON( data.price );
-		tpl += '<span class="price">';
-			for (p in price) {
-				//console.log(p);
-				tpl += p + ': '+ price[p] + ' | ';
-			}
-			tpl = tpl.substr(0, tpl.length -3);
-		tpl +='</span><br>';
-	}
-	
-	if (data.info !== "undefined" && data.info !== "") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
-	
-	tpl = tpl.substr(0, tpl.length -4);
-	
-	tpl += '</p></div><p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p></div>';
-	
-	return tpl;
-}
 
 
 
@@ -408,7 +381,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 	if (fetchFromApi == undefined)
 		fetchFromApi = true;
 
-	$('#busy').fadeIn('fast');
+	
 	console.log("reading meals of mensa " + mensaid + " (with datestamp " + datestamp + ")");
 	
 	if (datestamp == getDatestamp()) $('#speiseplan .skipdayleft').addClass("inactive");
@@ -417,6 +390,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 	$('#speiseplan').data("datestamp",datestamp);
 	$('#speiseplan').data("mensaid",mensaid);
 	var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
+	
 	
 	// db request mensa
 	db.transaction(function(tx) {
@@ -427,7 +401,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 
 			if (len == 1) {
 				var mensa = results.rows.item(0);
-				speiseplan.prepend('<div class="square"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck+'</span></p></div></div>');
+				speiseplan.prepend('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck+'</span></p></div></div>');
 			}
 
 		}, dbError);
@@ -438,13 +412,14 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 	
 	// db request meals
 	db.transaction(function(tx) {
-		tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC', [], function(tx, results) {
+		tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, mealid ASC', [], function(tx, results) {
 			// success function
 
 			var len = results.rows.length;
 
 			if (len == 0) {
 				if (fetchFromApi == true) {
+					$('#busy').fadeIn('fast');
 					getMealsFromApi(mensaid, datestamp);
 					return;
 				} else {
@@ -467,7 +442,8 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				speiseplan.append(mealListTpl(meal));
 
 				if (i == len - 1) { // last loop
-					// db request foodplan
+				
+				// db request foodplan
 					db.transaction(function(tx) {
 						tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"', [], function(tx, results) {
 							// success function
@@ -475,14 +451,29 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 							var len = results.rows.length;
 				
 							if (len == 1) {
+								
 								var foodplan = results.rows.item(0);
-								//$('#speiseplan .navigationbar h1').text(foodplan.label);
-								speiseplan.append("Beilagen...");
+								console.log(typeof foodplan.trimmings);
+								var trimmings = jQuery.parseJSON( foodplan.trimmings );
+								console.log(typeof trimmings);
+								var tlen = trimmings.length;
+								
+								for (var j=0; j<tlen; j++){
+									speiseplan.append(trimmingListTpl(trimmings[j]));
+									if (j == tlen-1) {
+										refreshScroll($('#speiseplan'));
+										$('#busy').fadeOut();
+									}
+								}
+								
+								if (tlen == 0) {
+									refreshScroll($('#speiseplan'));
+									$('#busy').fadeOut();
+								}
 								
 							}
 							
-							refreshScroll($('#speiseplan'));
-							$('#busy').fadeOut();
+							
 				
 						}, dbError);
 					}, dbError);
@@ -493,6 +484,68 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 		}, dbError);
 	}, dbError);
 }
+
+
+
+function mealListTpl(data){
+	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
+	
+	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
+	
+	tpl += '<h2>'+data.name+' </h2><p>';
+	
+	
+	if (typeof data.price !== "undefined" && data.price !== "undefined" && data.price !== "") {
+		var price = jQuery.parseJSON( data.price );
+		tpl += '<span class="price">';
+			for (p in price) {
+				//console.log(p);
+				tpl += p + ': '+ price[p] + ' | ';
+			}
+			tpl = tpl.substr(0, tpl.length -3);
+		tpl +='</span><br>';
+	}
+	
+	if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
+	
+	tpl = tpl.substr(0, tpl.length -4);
+	
+	tpl += '</p></div><p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p></div>';
+	
+	return tpl;
+}
+
+
+function trimmingListTpl(data){
+	var tpl = '<div class="square trimming" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
+	
+	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
+	
+	tpl += '<h3>'+data.name+' </h3><p>';
+	
+	
+	if (typeof data.price !== "undefined" && data.price !== "undefined" && data.price !== "") {
+		var price = jQuery.parseJSON( data.price );
+		tpl += '<span class="price">';
+			for (p in price) {
+				//console.log(p);
+				tpl += p + ': '+ price[p] + ' | ';
+			}
+			tpl = tpl.substr(0, tpl.length -3);
+		tpl +='</span><br>';
+	}
+	
+	if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
+	
+	tpl = tpl.substr(0, tpl.length -4);
+	
+	tpl += '</p></div></div>';
+	
+	return tpl;
+}
+
+
+
 
 
 function getMealsFromApi(mensaid, datestamp) {
@@ -531,7 +584,7 @@ function getMealsFromApi(mensaid, datestamp) {
 						
 					if ( typeof meal.recommendations == "undefined") {
 						meal.recommendations = 0;
-						meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
+						//meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
 					}
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
@@ -552,6 +605,7 @@ function getMealsFromApi(mensaid, datestamp) {
 		DEBUG_MODE && console.log(results);
 		$('#busy').fadeOut();
 
+		
 		if (results.error.title) {
 			var title = results.error.title + "";
 		} else {
@@ -562,6 +616,8 @@ function getMealsFromApi(mensaid, datestamp) {
 		} else {
 			var msg = "Es ist ein unbekannter Fehler aufgetreten.";
 		}
+		
+		if (results.error.key == "no_foodplan_data") $('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>');
 
 		navigator.notification.alert(msg, // message
 		alertDismissed, // callback
