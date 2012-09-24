@@ -222,24 +222,41 @@ function writeMensen(tx, results) {
 		return true;
 	}
 	
+	var mensenliste = $('#mensen .content').html('<ul class="mensen"></ul>');
+	
+	var numberOfFavorites = 0;
+	for (var i=0; i<len; i++){
+		mensa = results.rows.item(i);
+		if (mensa['isfavorite'] == 1) {
+			numberOfFavorites++;
+			mensenliste.append(mensenListTpl(mensa));
+		}
+		
+		if (i == len-1 && numberOfFavorites > 0) hideSplashscreen();
+    }
+	
+	
+	
 	// get curren user position
 	api('getgeoip',
 	
 		function(location){
-			var mensenliste = $('#mensen .content').html('<ul class="mensen"></ul>');
+			
+			mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
+			
 			// sort by distance
 			var mensen = new Array();
 			for (var i=0; i<len; i++){
 				mensa = results.rows.item(i);
-				//mensen[i]['distance'] = Math.sqrt( squareit(location.geoip.lon - mensen[i]['coord_lon']) + squareit(location.geoip.lat - mensen[i]['coord_lat']) );
+				if (mensa['isfavorite'] == 1) continue;
+				
+				// calculate distance
 				var dx = 111.3 * Math.cos((location.geoip.lat + mensa['coord_lat'])/2*0.01745) * (location.geoip.lon - mensa['coord_lon']);
 				var dy = 111.3 * (location.geoip.lat - mensa['coord_lat']);
 				mensa['distance'] = roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
-				if (mensa['isfavorite'] == 1) {
-					mensenliste.append(mensenListTpl(mensa));
-				} else {
-					mensen.push(mensa);
-				}
+			
+				mensen.push(mensa);
+				
 		    }
 			mensen.sort(function(a,b) {
 				return parseFloat(a.distance) - parseFloat(b.distance);
@@ -617,7 +634,7 @@ function getMealsFromApi(mensaid, datestamp) {
 			var msg = "Es ist ein unbekannter Fehler aufgetreten.";
 		}
 		
-		if (results.error.key == "no_foodplan_data") $('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>');
+		if (results.error.key == "no_meals") $('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>');
 
 		navigator.notification.alert(msg, // message
 		alertDismissed, // callback

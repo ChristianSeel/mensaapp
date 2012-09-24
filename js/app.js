@@ -228,6 +228,7 @@ $(function(){
 		console.log("go to speiseplan "+mensaid);
 		getMenu(mensaid, getDatestamp(), true);
 		jQT.goTo("#speiseplan","slideleft");
+		$('#speiseplan .skipdayright').removeClass('inactive');
 		return false;
 	});
 	
@@ -251,6 +252,7 @@ $(function(){
 	// next day
 	$('#speiseplan .skipdayright').live("click",function(e) {
 		e.preventDefault();
+		if ($(this).hasClass('inactive')) return false;
 		var mensaid = $('#speiseplan').data('mensaid');
 		var nextdatestamp = $('#speiseplan').data("datestamp")
 		nextdatestamp = AddDays(Datestamp2Date(nextdatestamp),1);
@@ -265,6 +267,7 @@ $(function(){
 	// prev day
 	$('#speiseplan .skipdayleft').live("click",function(e) {
 		e.preventDefault();
+		if ($(this).hasClass('inactive')) return false;
 		var mensaid = $('#speiseplan').data('mensaid');
 		var nextdatestamp = $('#speiseplan').data("datestamp")
 		nextdatestamp = AddDays(Datestamp2Date(nextdatestamp),-1);
