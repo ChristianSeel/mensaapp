@@ -249,14 +249,7 @@ function writeMensen(tx, results) {
 			var mlen = mensen.length;
 			for (var i=0; i<mlen; i++){
 				if (i > 100 || (mensen[i]['distance'] > 150 && i > 25) || i == (mlen - 1)) {
-					mensenliste.append('
-						<div class="square" class="linkToAbc">
-							<div class="innerwrapper">
-								<h3>Alle Mensen anzeigen</h3>
-								<p>Zur alphabetischen Liste</p>
-							</div>
-						</div>
-					');
+					mensenliste.append('<div class="square" class="linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
 					refreshScroll($('#mensen'));
 					return;
 				}
@@ -284,19 +277,10 @@ function mensenListTpl(data){
 	var tpl = "";
 	var favoriteclass = "";
 	if (data.isfavorite == 1) favoriteclass = " isfavorite";
-	tpl += '
-			<div class="square mensa" data-mensaid="'+data.mensaid+'">
-				<span class="addFavorite'+favoriteclass+'"></span>
-				<div class="innerwrapper">
-					<h3>'+data.name+'</h3>
-					<p><span class="org">'+data.org+'</span><br>
-		';
+	tpl += '<div class="square mensa" data-mensaid="'+data.mensaid+'"><span class="addFavorite'+favoriteclass+'"></span><div class="innerwrapper"><h3>'+data.name+'</h3><p><span class="org">'+data.org+'</span><br>';
 	if (typeof data.distance !== "undefined") tpl += '<span class="distance">Entfernung: <span class="distance_value">'+data.distance+' km</span></span><br>';
 	tpl = tpl.substr(0, tpl.length -4);
-	tpl += '</p>
-				</div>
-			</div>
-			';
+	tpl += '</p></div></div>';
 	
 	return tpl;
 }
@@ -304,7 +288,7 @@ function mensenListTpl(data){
 
 
 
-/*function getMenu(mensaid, datestamp, redirect){
+/*function getMenuDirect(mensaid, datestamp, redirect){
 	
 	$('#busy').fadeIn();
 	
@@ -388,10 +372,8 @@ function mensenListTpl(data){
 
 
 function mealListTpl(data){
-	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'">
-				<div class="innerwrapper">
-				<h2>'+data.name+' </h2>
-				';
+	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper"><h2>'+data.name+' </h2>';
+	
 	if (typeof data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span>';
 	tpl += '<p>';
 	if (typeof data.price !== "undefined") {
@@ -407,12 +389,7 @@ function mealListTpl(data){
 	
 	tpl = tpl.substr(0, tpl.length -4);
 	
-	tpl += '
-					</p>
-				</div>
-				<p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p>
-			</div>
-			';
+	tpl += '</p></div><p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p></div>';
 	
 	return tpl;
 }

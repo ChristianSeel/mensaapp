@@ -147,14 +147,11 @@ var app = {
 
 // handle the android back button as default back button
 function onBackKeyDown() {
-    jQT.goBack();
+    if (jQT.goBack() === "exit" && devicePlatform !== "ios") navigator.app.exitApp();
 }
 
 function onMenuKeyDown() {
- /*   if ( $('#jqt > .current .navigationbar .refreshIcon:visible').length ){
-	    $('#jqt > .current .navigationbar .refreshIcon:visible').trigger("click");
-    }
-  */
+	jQT.goTo( "#mensen" ,"");
 }
 
 
@@ -211,12 +208,12 @@ $(function(){
 	
 	
 	
-	$('#fblogin').live(clickEvent,function(e) {
+	$('#fblogin').live("click",function(e) {
 		e.preventDefault();
 		fbLogin();
 	});
 	
-	$('#fblogout').live(clickEvent,function(e) {
+	$('#fblogout').live("click",function(e) {
 		e.preventDefault();
 		fbLogout();
 	});
@@ -256,7 +253,7 @@ $(function(){
 	
 
 	// refesh Icon
-	$('#events .refreshIcon').live(clickEvent,function(e) {
+	$('#events .refreshIcon').live("click",function(e) {
 	    e.preventDefault();
 	    if ($(this).hasClass('rotate')) {
 	    	// do nothing
@@ -274,7 +271,7 @@ $(function(){
 	
 /*	
 	// event fb actions
-	$('#jqt > div[data-iseventpage] a[data-fbaction]').live(clickEvent,function(e) {
+	$('#jqt > div[data-iseventpage] a[data-fbaction]').live("click",function(e) {
 	    e.preventDefault();
 	    switch($(this).data('fbaction')){
 		    case "rsvp_event":
@@ -397,7 +394,7 @@ function onLogin(){
 }
 
 
-
+/*
 function getKontoTpl(){
 	var pluralE = "e";
 	if (fbuser.numberofcoupons == 1) pluralE = "";
@@ -420,7 +417,7 @@ function getKontoTpl(){
 <a href="#" id="fblogout" class="bold bluebutton icon">Abmelden</a>';
 return tpl
 }
-
+*/
 
 
 
