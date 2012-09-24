@@ -13,7 +13,7 @@ h3,.h3{font-size:12px;font-weight:700}
 h4,.h4{font-size:12px;text-transform:uppercase}
 h5,.h5{font-size:12px;text-transform:uppercase}
 h6,.h6{font-size:12px;text-transform:uppercase}
-p{font-size:11px;line-height:1.35;margin:2px 0;color:#444}
+p{font-size:11px;line-height:1.5;margin:1px 0;color:#444}
 b,.bold,strong{font-weight:600}
 .hide-text{text-indent:100%;white-space:nowrap;overflow:hidden}
 .clearfix{zoom:1}

@@ -510,12 +510,11 @@ function api(url, success, fail) {
 		return false;
 	}
 	
-	
+	DEBUG_MODE && console.log("api request: "+url);
 	
 	if (url.indexOf("?") == -1) url += "?";
 	url += "&ma_hash="+hash.gen("enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion);
-	DEBUG_MODE && console.log("api request: "+url);	
-	
+		
 	
 	$.getJSONP({
 			url: api_url+url,
