@@ -374,12 +374,12 @@ function mensenListTpl(data){
 function mealListTpl(data){
 	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
 	
-	if (data.label !== "undefined" && data.label !== "null") tpl += '<p><span class="label">'+data.label+'</span></p>';
+	if (data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
 	
 	tpl += '<h2>'+data.name+' </h2><p>';
 	
 	
-	if (data.price !== "undefined" && data.price !== "null") {
+	if (data.price !== "undefined" && data.price !== "") {
 		var price = jQuery.parseJSON( data.price );
 		tpl += '<span class="price">';
 			for (p in price) {
@@ -390,7 +390,7 @@ function mealListTpl(data){
 		tpl +='</span><br>';
 	}
 	
-	if (data.info !== "undefined" && data.info !== "null") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
+	if (data.info !== "undefined" && data.info !== "") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
 	
 	tpl = tpl.substr(0, tpl.length -4);
 	
@@ -461,12 +461,11 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 			}
 
 
-			//speiseplan.prepend(mealListTpl(meal));
 
 			for (var i = 0; i < len; i++) {
 				meal = results.rows.item(i);
 				speiseplan.append(mealListTpl(meal));
-				
+
 				if (i == len - 1) { // last loop
 					// db request foodplan
 					db.transaction(function(tx) {
@@ -518,12 +517,22 @@ function getMealsFromApi(mensaid, datestamp) {
 				// meals
 				for (var j = 0; j < foodplan.meals.length; j++) {
 					var meal = foodplan.meals[j];
-
-					if ( typeof meal.price == "object")
-						meal.price = JSON.stringify(meal.price);
-					if ( typeof meal.recommendations == "undefined")
+					
+					if ( typeof meal.label == "undefined")
+						meal.label = "";
+						
+					if ( typeof meal.info == "undefined")
+						meal.info = "";
+					
+					if ( typeof meal.name == "undefined")
+						meal.name = "";
+					
+					meal.price = JSON.stringify(meal.price);
+						
+					if ( typeof meal.recommendations == "undefined") {
 						meal.recommendations = 0;
-					meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
+						meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
+					}
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
 					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
