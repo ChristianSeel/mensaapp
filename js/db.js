@@ -242,14 +242,15 @@ function getMensenFromDB(listabc){
 				navigator.geolocation.getCurrentPosition(
 					function(position){
 					// success
-						var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude};
+						var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude, geoip: "false"};
 						listMensenByDistance(results, mensenliste, geoiplocation);
 					},
 					function(error){
 					// error - fallback geoip
+						DEBUG_MODE && console.log(error);
 						api('getgeoip',
 							function(location){
-								var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon};
+								var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon, geoip: "true"};
 								listMensenByDistance(results, mensenliste, geoiplocation);
 							},
 							function(error){
@@ -260,7 +261,7 @@ function getMensenFromDB(listabc){
 					// options
 					{
 						maximumAge: 60000,
-						timeout: 4000,
+						timeout: 10000,
 						enableHighAccuracy: false
 					}
 				);
@@ -292,7 +293,8 @@ function listMensenByName(results,mensenliste){
 }
 
 function listMensenByDistance(results,mensenliste,location){
-	mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
+	
+	if (location.geoip == "true") mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
 	
 	// sort by distance
 	var mensen = new Array();
@@ -439,7 +441,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 		fetchFromApi = true;
 
 	
-	console.log("reading meals of mensa " + mensaid + " (with datestamp " + datestamp + ")");
+	DEBUG_MODE && console.log("reading meals of mensa " + mensaid + " (with datestamp " + datestamp + ")");
 	
 	if (datestamp == getDatestamp()) $('#speiseplan .skipdayleft').addClass("inactive");
 	
@@ -510,21 +512,19 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 							if (len == 1) {
 								
 								var foodplan = results.rows.item(0);
-								console.log(typeof foodplan.trimmings);
 								var trimmings = jQuery.parseJSON( foodplan.trimmings );
-								console.log(typeof trimmings);
 								var tlen = trimmings.length;
 								
 								for (var j=0; j<tlen; j++){
 									speiseplan.append(trimmingListTpl(trimmings[j]));
 									if (j == tlen-1) {
-										refreshScroll($('#speiseplan'));
+										refreshScroll($('#speiseplan'),true);
 										$('#busy').fadeOut();
 									}
 								}
 								
 								if (tlen == 0) {
-									refreshScroll($('#speiseplan'));
+									refreshScroll($('#speiseplan'),true);
 									$('#busy').fadeOut();
 								}
 								
@@ -556,7 +556,6 @@ function mealListTpl(data){
 		var price = jQuery.parseJSON( data.price );
 		tpl += '<span class="price">';
 			for (p in price) {
-				//console.log(p);
 				tpl += p + ': '+ price[p] + ' | ';
 			}
 			tpl = tpl.substr(0, tpl.length -3);
@@ -585,7 +584,6 @@ function trimmingListTpl(data){
 		var price = jQuery.parseJSON( data.price );
 		tpl += '<span class="price">';
 			for (p in price) {
-				//console.log(p);
 				tpl += p + ': '+ price[p] + ' | ';
 			}
 			tpl = tpl.substr(0, tpl.length -3);
@@ -607,11 +605,10 @@ function trimmingListTpl(data){
 
 function getMealsFromApi(mensaid, datestamp) {
 
-	console.log("fetching meals of mensa " + mensaid + " from api");
+	DEBUG_MODE && console.log("fetching meals of mensa " + mensaid + " from api");
 	
 	api('getmeals?mensaid=' + mensaid, function(results) {
 		//success
-		//DEBUG_MODE && console.log(results);
 		var days = results.days.length;
 
 		db.transaction(function(tx) {

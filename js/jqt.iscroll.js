@@ -18,7 +18,7 @@
 				if (scroll !== undefined && scroll !== null) {
 	    			if (jumpToTop == true) {
 		    			scroll.scrollTo(0,0,500);
-		    			setTimeout(function(){scroll.refresh();},450);
+		    			setTimeout(function(){scroll.refresh();},501);
 	    			} else {
 		    			scroll.refresh();
 	    			}

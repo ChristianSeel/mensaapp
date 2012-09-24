@@ -66,7 +66,7 @@ var app = {
 				googleAnalytics.startTrackerWithAccountID("UA-34897325-1");
 			} else {
 				googleAnalytics = window.plugins.analytics;
-				googleAnalytics.start("UA-34897325-1", function(){console.log("Analytics: start success");}, function(){console.log("Analytics: start failure");});
+				googleAnalytics.start("UA-34897325-1", function(){DEBUG_MODE && console.log("Analytics: start success");}, function(){DEBUG_MODE && console.log("Analytics: start failure");});
 			}
 			
 		}
@@ -90,7 +90,7 @@ var app = {
 			});
 			
 		} catch (e) {
-			console.log(e);
+			DEBUG_MODE && console.log(e);
 		}
 		
 		
@@ -174,8 +174,10 @@ $(function(){
 	 * Links
 	 */
 	$('a[data-href]').bind("click",function(e) {
-		e.preventDefault();	
-		jQT.goTo( $(this).data('href') ,"");
+		e.preventDefault();
+		var destination = $(this).data('href');
+		if (destination == "#mensen") getMensenFromDB(false);
+		jQT.goTo(destination ,"");
 	});
 	
 	
@@ -222,7 +224,6 @@ $(function(){
 	
 	$('#mensen .linkToAbc').live("click",function(e){
 		e.preventDefault();
-		console.log("nav to abc list");
 		getMensenFromDB(true);
 	});
 	
@@ -231,7 +232,7 @@ $(function(){
 	$('.mensa').live("click",function(e){
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
-		console.log("go to speiseplan "+mensaid);
+		DEBUG_MODE && console.log("go to speiseplan "+mensaid);
 		getMenu(mensaid, getDatestamp(), true);
 		jQT.goTo("#speiseplan","slideleft");
 		$('#speiseplan .skipdayright').removeClass('inactive');
@@ -245,11 +246,11 @@ $(function(){
 		if ($(this).hasClass('isfavorite') === true) {
 		    // remove from favorites
 		    if (removeMensaFromFavorite(mensaid) === true) $(this).removeClass('isfavorite');
-		    console.log("mensa "+mensaid+" removed from favorites");
+		    DEBUG_MODE && console.log("mensa "+mensaid+" removed from favorites");
 	    } else {
 		    // add to favorites
 		    if (addMensaToFavorite(mensaid) === true) $(this).addClass('isfavorite');
-		    console.log("mensa "+mensaid+" added to favorites");
+		    DEBUG_MODE && console.log("mensa "+mensaid+" added to favorites");
 		}
 		return false;
 	});
@@ -342,7 +343,6 @@ $(function(){
 
 
 function addMensaToFavorite(mensaid) {
-	console.log("addMensaToFavorite "+mensaid);
 	db.transaction(function(tx){
 		tx.executeSql('UPDATE Mensen SET isfavorite=1 WHERE mensaid='+mensaid);
 	}, dbError, function(){});
@@ -350,7 +350,6 @@ function addMensaToFavorite(mensaid) {
 }
 
 function removeMensaFromFavorite(mensaid) {
-	console.log("removeMensaFromFavorite "+mensaid);
 	db.transaction(function(tx){
 		tx.executeSql('UPDATE Mensen SET isfavorite=0 WHERE mensaid='+mensaid);
 	}, dbError, function(){});
