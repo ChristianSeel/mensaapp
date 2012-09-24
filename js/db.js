@@ -129,11 +129,11 @@ function checkLastUpdate(tx, results) {
 	if (doUpdate == true) {
 		DEBUG_MODE && console.log("full data update needed.");
 		
-		getMensenFromApi(function(){hideSplashscreen();});
+		getMensenFromApi();
 		
 	} else {
 		// data is up to date
-		getMensenFromDB(function(){hideSplashscreen();});
+		getMensenFromDB();
 		
 	}
 
@@ -198,11 +198,8 @@ function getMensenFromApi(cb) {
 
 
 
-function getMensenFromDB(cb){
-	if (cb == null) cb = function(){};
+function getMensenFromDB(){
 	db.transaction(getMensen, dbError);
-	
-	setTimeout(function(){cb();}, 350);
 }
 
 
@@ -251,10 +248,12 @@ function writeMensen(tx, results) {
 				if (i > 100 || (mensen[i]['distance'] > 150 && i > 25) || i == (mlen - 1)) {
 					mensenliste.append('<div class="square" class="linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
 					refreshScroll($('#mensen'));
+					hideSplashscreen(); // hide dom splashscreen on init
 					return;
 				}
 				mensenliste.append(mensenListTpl(mensen[i]));
 		    }
+		    
 		       
 		},
 		
@@ -374,18 +373,22 @@ function mensenListTpl(data){
 function mealListTpl(data){
 	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper"><h2>'+data.name+' </h2>';
 	
-	if (typeof data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span>';
+	if (data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span>';
 	tpl += '<p>';
-	if (typeof data.price !== "undefined") {
+	
+	
+	if (data.price !== "undefined") {
+		var price = jQuery.parseJSON( data.price );
 		tpl += '<span class="price">';
-			for (p in data.price) {
-				tpl += p + ': '+ data.price[p] + ' | ';
+			for (p in price) {
+				//console.log(p);
+				tpl += p + ': '+ price[p] + ' | ';
 			}
 			tpl = tpl.substr(0, tpl.length -3);
 		tpl +='</span><br>';
 	}
 	
-	if (typeof data.info !== "undefined") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
+	if (data.info !== "undefined") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
 	
 	tpl = tpl.substr(0, tpl.length -4);
 	
@@ -404,8 +407,10 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 		fetchFromApi = true;
 
 	$('#busy').fadeIn('fast');
-	console.log("reading meals of mensa " + mensaid);
-
+	console.log("reading meals of mensa " + mensaid + " (with datestamp " + datestamp + ")");
+	
+	var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
+	
 	// db request
 	db.transaction(function(tx) {
 		tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC', [], function(tx, results) {
@@ -428,7 +433,6 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				}
 			}
 
-			var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
 
 			//speiseplan.prepend(mealListTpl(meal));
 
@@ -445,6 +449,8 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 
 function getMealsFromApi(mensaid, datestamp) {
 
+	console.log("fetching meals of mensa " + mensaid + " from api");
+	
 	api('getmeals?mensaid=' + mensaid, function(results) {
 		//success
 		//DEBUG_MODE && console.log(results);
@@ -458,11 +464,12 @@ function getMealsFromApi(mensaid, datestamp) {
 				for (var j = 0; j < foodplan.meals.length; j++) {
 					var meal = foodplan.meals[j];
 
-					if ( typeof meal.price !== "undefined")
-						meal.price = new String(meal.price);
+					if ( typeof meal.price == "object")
+						meal.price = JSON.stringify(meal.price);
 					if ( typeof meal.recommendations == "undefined")
 						meal.recommendations = 0;
-					meal.recommendations = (Math.random() * (100 - 1)) + 100;
+					meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
+
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
 					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
 				}
