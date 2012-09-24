@@ -247,7 +247,37 @@ $(function(){
 	});
 	
 	
+	// next day
+	$('#speiseplan .skipdayright').live("click",function(e) {
+		e.preventDefault();
+		var mensaid = $('#speiseplan').data('mensaid');
+		var nextdatestamp = $('#speiseplan').data("datestamp")
+		nextdatestamp = AddDays(Datestamp2Date(nextdatestamp),1);
+		if (typeof mensaid == "undefined" || typeof nextdatestamp == "undefined") {
+			alert("ERROR");
+			return false;
+		}
+		getMenu(mensaid, getDatestamp(nextdatestamp), true);
+		$('#speiseplan .skipdayleft').removeClass("inactive");
+	});
 	
+	// prev day
+	$('#speiseplan .skipdayleft').live("click",function(e) {
+		e.preventDefault();
+		var mensaid = $('#speiseplan').data('mensaid');
+		var nextdatestamp = $('#speiseplan').data("datestamp")
+		nextdatestamp = AddDays(Datestamp2Date(nextdatestamp),-1);
+		if (typeof mensaid == "undefined" || typeof nextdatestamp == "undefined") {
+			alert("ERROR");
+			return false;
+		}
+
+		if (nextdatestamp.getTime() < Datestamp2Date(getDatestamp()).getTime() ) {
+			$('#speiseplan .skipdayleft').addClass("inactive");
+			return false;
+		}
+		getMenu(mensaid, getDatestamp(nextdatestamp), true);
+	});
 		
 	
 	
@@ -594,14 +624,51 @@ function getTimestamp(){
 	return Math.round(+new Date()/1000);
 }
 
+
 function getDatestamp(time){
 	if (typeof time == "undefined") {
 		d = new Date();
 	} else {
-		d = new Date(time);
+		d = time;
 	}
 	return (d.getFullYear()+"") + (pad(d.getMonth()+1,2)+"") + (pad(d.getDate(),2)+"");
 }
+
+function Datestamp2Date(datestamp){
+	year = datestamp.substring(0,4);
+	month = datestamp.substring(4,6);
+	month = month - 1;
+	day = datestamp.substring(6,8);
+	return new Date(year, month, day);
+}
+
+function Datestamp2String(datestamp){
+	if (typeof datestamp == "undefined") {
+		d = new Date();
+	} else {
+		d = Datestamp2Date(datestamp);
+	}
+	var daylabels = new Array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag");
+	return (daylabels[d.getDay()] + ", der " + pad(d.getDate(),2) + "." + pad(d.getMonth()+1,2) + "." + d.getFullYear());
+}
+
+function AddDays(date, amount)
+{
+    var tzOff = date.getTimezoneOffset() * 60 * 1000;
+    var t = date.getTime();
+    t += (1000 * 60 * 60 * 24) * amount;
+    var d = new Date();
+    d.setTime(t);
+    var tzOff2 = d.getTimezoneOffset() * 60 * 1000;
+    if (tzOff != tzOff2)
+    {
+        var diff = tzOff2 - tzOff;
+        t += diff;
+        d.setTime(t);
+    }
+    return d;
+}
+
 
 function roundNumber(num, dec) {
 	return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);

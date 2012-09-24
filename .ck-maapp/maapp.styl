@@ -353,6 +353,28 @@ body, #splashscreen
  *
  */
 
+.blanktext
+	padding: 15px 20px
+	text-shadow: 0 1px 0 white
+	text-align: center
+
+#speiseplan
+	.skipdayleft, .skipdayright
+		position: absolute
+		left: 0
+		top: 0
+		width: 30px
+		height: 26px
+		background: transparent url(imagePath/icon-arrow-left.png) center center no-repeat
+		background-size: 26px
+	.skipdayright
+		left: auto
+		right: 0
+		background-image: url(imagePath/icon-arrow-right.png)
+	.skipdayleft.inactive
+		opacity: 0.4
+
+
 .square
 	position: relative
 	width: auto

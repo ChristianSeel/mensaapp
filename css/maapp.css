@@ -56,6 +56,10 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") top left;back
 #tabbar ul li.bigger a{padding-top:36px;background-position:50% 7px;color:#fff}
 .scrollwrapper{width:100%;position:absolute;top:0;bottom:49px;z-index:15;overflow:hidden;margin-top:86px}
 .scrollpanel{width:100%;min-height:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;position:relative;padding:0 5px 15px}
+.blanktext{padding:15px 20px;text-shadow:0 1px 0 #fff;text-align:center}
+#speiseplan .skipdayleft,#speiseplan .skipdayright{position:absolute;left:0;top:0;width:30px;height:26px;background:transparent url("../img/icon-arrow-left.png") center center no-repeat;-webkit-background-size:26px;-moz-background-size:26px;-o-background-size:26px;-ms-background-size:26px;background-size:26px}
+#speiseplan .skipdayright{left:auto;right:0;background-image:url("../img/icon-arrow-right.png")}
+#speiseplan .skipdayleft.inactive{opacity:.4;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=40)}
 .square{position:relative;width:auto;margin:10px 4px;background:#f7f7f7 -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(1, #f5f5f5));background:#f7f7f7 -webkit-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:#f7f7f7 -moz-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:#f7f7f7 -o-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:#f7f7f7 -ms-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:#f7f7f7 linear-gradient(top, #fff 0%, #f5f5f5 100%);border:1px solid #d0d0d0;-webkit-border-radius:4px;-moz-border-radius:4px;-o-border-radius:4px;-ms-border-radius:4px;border-radius:4px;-webkit-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13);-moz-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13);-o-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13);-ms-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13);box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13);zoom:1;}
 .square:before,.square:after{content:"";display:table}
 .square:after{clear:both}

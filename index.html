@@ -48,7 +48,7 @@
 			
 			var DEBUG_MODE = true;
 			var appversion = "0.2.0";
-			var requiredDBVersion = 8;
+			var requiredDBVersion = 9;
 			
 			var base_url = "http://mensaapp.de/";
 			var static_url = "http://static.mensaapp.de/";
@@ -88,9 +88,7 @@
 				slideSelector: '.slideleft, .slide, #jqt > * > ul.slide li a, #jqt > * > ul li.slide a',
 				preloadImages: []
 			});
-			
-			document.getElementById('appversion').innerHTML = appversion;
-			document.getElementById('splashappversion').innerHTML = "v"+appversion;
+
 		</script>
 		
 		
@@ -144,6 +142,7 @@
 			
 				<div class="navigationbar">
 					<h1>Mensen in deiner Nähe</h1>
+					<span>
 				</div>
 				
 				<div class="scrollwrapper">
@@ -162,7 +161,9 @@
 			<div id="speiseplan">
 			
 				<div class="navigationbar">
+					<span class="skipdayleft"></span>
 					<h1>Speiseplan</h1>
+					<span class="skipdayright"></span>
 				</div>
 				
 				<div class="scrollwrapper">
@@ -257,5 +258,10 @@
 			
 		</div> <!-- #jqt -->
 		
+		
+		<script>
+			document.getElementById('appversion').innerHTML = appversion;
+			document.getElementById('splashappversion').innerHTML = "v"+appversion;
+		</script>
 	</body>
 </html>
