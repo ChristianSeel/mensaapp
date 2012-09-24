@@ -171,9 +171,9 @@ $(function(){
 	initiscroll();
 	
 	/*
-	 * Tab bar
+	 * Links
 	 */
-	$('#tabbar ul li a').bind("click",function(e) {
+	$('a[data-href]').bind("click",function(e) {
 		e.preventDefault();	
 		jQT.goTo( $(this).data('href') ,"");
 	});
@@ -218,8 +218,9 @@ $(function(){
 		fbLogout();
 	});
 	
-
-
+	
+	
+	
 	
 	$('.mensa').live("click",function(e){
 		e.preventDefault();
