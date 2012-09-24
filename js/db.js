@@ -128,8 +128,8 @@ function checkLastUpdate(tx, results) {
 	
 	
 	if (doUpdate == true) {
-		DEBUG_MODE && console.log("full data update needed.");
-		
+		DEBUG_MODE && console.log("mensen data update needed.");
+		$('#busy').fadeIn();
 		getMensenFromApi();
 		
 	} else {
@@ -148,6 +148,8 @@ function checkLastUpdate(tx, results) {
 function getMensenFromApi(cb) {
 	
 	if (cb == null) cb = function(){};
+	
+	$('#busy').fadeIn();
 	
 	api('getmensen', function(results){
 		//success
@@ -198,97 +200,135 @@ function getMensenFromApi(cb) {
 }
 
 
-
-function getMensenFromDB(){
-	db.transaction(getMensen, dbError);
-}
-
-
 /*
  *
  * Write events from database to dom
  *
  */
 
-function getMensen(tx) {
-    tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC' , [], writeMensen, dbError);
-}
+function getMensenFromDB(listabc){
+	
+	if (listabc == undefined)
+		listabc = false;
 
-function writeMensen(tx, results) {
-	var len = results.rows.length;
-	
-	if (len == 0) {
-		getMensenFromApi();
-		return true;
-	}
-	
-	var mensenliste = $('#mensen .content').html('<ul class="mensen"></ul>');
-	
-	var numberOfFavorites = 0;
-	for (var i=0; i<len; i++){
-		mensa = results.rows.item(i);
-		if (mensa['isfavorite'] == 1) {
-			numberOfFavorites++;
-			mensenliste.append(mensenListTpl(mensa));
-		}
-		
-		if (i == len-1 && numberOfFavorites > 0) hideSplashscreen();
-    }
-	
-	
-	
-	// get curren user position
-	api('getgeoip',
-	
-		function(location){
+	db.transaction(function(tx) {
+	    tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC' , [],
+	    function(tx, results){
+	    //success
+	    	
+			var len = results.rows.length;
 			
-			mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
+			if (len == 0) {
+				getMensenFromApi();
+				return true;
+			}
 			
-			// sort by distance
-			var mensen = new Array();
+			var mensenliste = $('#mensen .content').html('<ul class="mensen"></ul>');
+			
+			var numberOfFavorites = 0;
 			for (var i=0; i<len; i++){
 				mensa = results.rows.item(i);
-				if (mensa['isfavorite'] == 1) continue;
-				
-				// calculate distance
-				var dx = 111.3 * Math.cos((location.geoip.lat + mensa['coord_lat'])/2*0.01745) * (location.geoip.lon - mensa['coord_lon']);
-				var dy = 111.3 * (location.geoip.lat - mensa['coord_lat']);
-				mensa['distance'] = roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
-			
-				mensen.push(mensa);
-				
-		    }
-			mensen.sort(function(a,b) {
-				return parseFloat(a.distance) - parseFloat(b.distance);
-			});
-			var mlen = mensen.length;
-			for (var i=0; i<mlen; i++){
-				if (i > 100 || (mensen[i]['distance'] > 150 && i > 25) || i == (mlen - 1)) {
-					mensenliste.append('<div class="square" class="linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
-					refreshScroll($('#mensen'));
-					hideSplashscreen(); // hide dom splashscreen on init
-					return;
+				if (mensa['isfavorite'] == 1) {
+					numberOfFavorites++;
+					mensenliste.append(mensenListTpl(mensa));
 				}
-				mensenliste.append(mensenListTpl(mensen[i]));
+				
+				if (i == len-1 && numberOfFavorites > 0) hideSplashscreen();
 		    }
+			
+			
+			if (listabc == false) {
+				// get curren user position
+				navigator.geolocation.getCurrentPosition(
+					function(position){
+					// success
+						var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude};
+						listMensenByDistance(results, mensenliste, geoiplocation);
+					},
+					function(error){
+					// error - fallback geoip
+						api('getgeoip',
+							function(location){
+								var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon};
+								listMensenByDistance(results, mensenliste, geoiplocation);
+							},
+							function(error){
+								listMensenByName(results,mensenliste);
+							}
+						);
+					},
+					// options
+					{
+						maximumAge: 60000,
+						timeout: 4000,
+						enableHighAccuracy: false
+					}
+				);
+			} else {
+				listMensenByName(results,mensenliste);
+			}
 		    
-		       
-		},
-		
-		function(error){
-			$('#mensen .scrollpanel').html('<ul class="mensen"></ul>');
-			// abc
-		    for (var i=0; i<len; i++){
-				$('#mensen .scrollpanel ul.mensen').append(mensenListTpl(results.rows.item(i)));
-				if (i == (len - 1)) refreshScroll($('#mensen'));
-		    }
-		}
-	);
-	
-	
-    
-
+	    }, dbError);
+	}, dbError);
 }
+
+
+
+
+
+
+function listMensenByName(results,mensenliste){
+	$('#mensen .navigationbar h1').text("Mensa auswählen");
+	var len = results.rows.length;
+	for (var i=0; i<len; i++){
+		if (results.rows.item(i).isfavorite == 1) continue;
+		mensenliste.append(mensenListTpl(results.rows.item(i)));
+		if (i == (len - 1)) {
+			refreshScroll($('#mensen'), true);
+			$('#busy').fadeOut();
+			hideSplashscreen();
+		}
+	}
+}
+
+function listMensenByDistance(results,mensenliste,location){
+	mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
+	
+	// sort by distance
+	var mensen = new Array();
+	
+	var len = results.rows.length;
+	for (var i=0; i<len; i++){
+		mensa = results.rows.item(i);
+		if (mensa['isfavorite'] == 1) continue;
+		
+		// calculate distance
+		var dx = 111.3 * Math.cos((location.lat + mensa['coord_lat'])/2*0.01745) * (location.lon - mensa['coord_lon']);
+		var dy = 111.3 * (location.lat - mensa['coord_lat']);
+		mensa['distance'] = roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
+	
+		mensen.push(mensa);
+		
+    }
+	mensen.sort(function(a,b) {
+		return parseFloat(a.distance) - parseFloat(b.distance);
+	});
+	var mlen = mensen.length;
+	for (var i=0; i<mlen; i++){
+		if (i > 50 || (mensen[i]['distance'] > 100 && i > 25) || i == (mlen - 1)) {
+			mensenliste.append('<div class="square linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
+			refreshScroll($('#mensen'), true);
+			$('#busy').fadeOut();
+			hideSplashscreen(); // hide dom splashscreen on init
+			return;
+		}
+		mensenliste.append(mensenListTpl(mensen[i]));
+    }
+}
+
+
+
+
 
 function mensenListTpl(data){
 	var tpl = "";

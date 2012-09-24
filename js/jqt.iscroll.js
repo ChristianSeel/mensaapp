@@ -8,14 +8,21 @@
     var KEY_ISCROLL_OBJ = 'iscroll_object';
     
     
-    function refreshScroll($pane) {	
+    function refreshScroll($pane, jumpToTop) {	
+    	if (typeof jumpToTop == "undefined") jumpToTop = false;
     	
     	$pane.find('.scrollwrapper').each(function (i, wrap) {
     		var $wrapper = $(wrap);
     		var scroll = $wrapper.data(KEY_ISCROLL_OBJ);
     		setTimeout(function () {
 				if (scroll !== undefined && scroll !== null) {
-	    			scroll.refresh();
+	    			if (jumpToTop == true) {
+		    			scroll.scrollTo(0,0,500);
+		    			setTimeout(function(){scroll.refresh();},450);
+	    			} else {
+		    			scroll.refresh();
+	    			}
+	    			
 	    		} else {
 	    			buildScroll(wrap);
 	    		}

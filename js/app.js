@@ -220,6 +220,12 @@ $(function(){
 	
 	
 	
+	$('#mensen .linkToAbc').live("click",function(e){
+		e.preventDefault();
+		console.log("nav to abc list");
+		getMensenFromDB(true);
+	});
+	
 	
 	
 	$('.mensa').live("click",function(e){
