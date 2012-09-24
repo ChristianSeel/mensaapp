@@ -268,6 +268,7 @@
             if (history.length === 1 ) {
                 warn('You are on the first panel.');
                 window.history.go(-1);
+                return "exit";
             }
 
             var from = history[0],
