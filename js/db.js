@@ -371,10 +371,11 @@ function mensenListTpl(data){
 
 
 function mealListTpl(data){
-	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper"><h2>'+data.name+' </h2>';
+	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
 	
-	if (data.label !== "undefined") tpl += '<span class="label">'+data.label+'</span>';
-	tpl += '<p>';
+	if (data.label !== "undefined") tpl += '<p><span class="label">'+data.label+'</span></p>';
+	
+	tpl += '<h2>'+data.name+' </h2><p>';
 	
 	
 	if (data.price !== "undefined") {
