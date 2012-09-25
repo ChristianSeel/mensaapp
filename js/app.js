@@ -171,8 +171,10 @@ $(function(){
 	initiscroll();
 	
 	// tabbar
-	$('#tabbar a').bind("click",function(e) {
+	$('#tabbar li a').bind("click",function(e) {
 		e.preventDefault();
+		$('#tabbar li').removeClass('ac');
+		$(this).parents('li').addClass("ac");
 		var destination = $(this).data('href');
 		jQT.goTo(destination ,"");
 	});
@@ -182,7 +184,7 @@ $(function(){
 	/*
 	 * Links
 	 */
-	$('#jqt a[data-href]').bind("click",function(e) {
+	$('#jqt a[data-href]').live("click",function(e) {
 		e.preventDefault();
 		var destination = $(this).data('href');
 		jQT.goTo(destination ,"slideleft");

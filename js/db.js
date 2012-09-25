@@ -532,12 +532,14 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 						$('#busy').fadeOut();
 						speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
 						speiseplan.fadeIn('fast');
+						refreshScroll($('#speiseplan'),true);
 					/*	navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
 						alertDismissed, // callback
 						"Fehler", // title
 						'OK' // buttonName
 						);
 					*/
+						return;
 					}
 				}
 	
