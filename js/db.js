@@ -212,7 +212,7 @@ function getMensenFromDB(listabc){
 		listabc = false;
 
 	db.transaction(function(tx) {
-	    tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC' , [],
+	    tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
 	    function(tx, results){
 	    //success
 	    	
