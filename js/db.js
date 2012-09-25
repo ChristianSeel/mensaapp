@@ -251,40 +251,48 @@ function getMensenFromDB(listabc){
 					mensenliste.append(mensenListTpl(mensa));
 				}
 				
-				if (i == len-1 && numberOfFavorites > 0) hideSplashscreen();
+				if (i == len-1 && numberOfFavorites > 0) {
+					mensenliste.append('<div class="locationspinner"><p class="blanktext">Mensen in der Nähe suchen...<br>Bestimme Standort!</p></div>');
+					refreshScroll($('#mensen'), false);
+					hideSplashscreen();
+				}
 		    }
 			
 			
 			if (listabc == false) {
 				DEBUG_MODE && console.log("requesting device location...");
-				// get curren user position
-				navigator.geolocation.getCurrentPosition(
-					function(position){
-					// success
-						var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude, geoip: "false"};
-						listMensenByDistance(results, mensenliste, geoiplocation);
-					},
-					function(error){
-					// error - fallback geoip
-						DEBUG_MODE && console.log("could not get native geolocation: "+error.message);
-						api('getgeoip',
-							function(location){
-								var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon, geoip: "true"};
-								listMensenByDistance(results, mensenliste, geoiplocation);
-							},
-							function(error){
-								DEBUG_MODE && console.log("could not get geoip: "+error.description);
-								listMensenByName(results,mensenliste);
-							}
-						);
-					},
-					// options
-					{
-						maximumAge: 60000,
-						timeout: 10000,
-						enableHighAccuracy: false
-					}
-				);
+				
+				setTimeout(function(){
+					// get curren user position
+					navigator.geolocation.getCurrentPosition(
+						function(position){
+						// success
+							var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude, geoip: "false"};
+							listMensenByDistance(results, mensenliste, geoiplocation);
+						},
+						function(error){
+						// error - fallback geoip
+							DEBUG_MODE && console.log("could not get native geolocation: "+error.message);
+							api('getgeoip',
+								function(location){
+									var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon, geoip: "true"};
+									listMensenByDistance(results, mensenliste, geoiplocation);
+								},
+								function(error){
+									DEBUG_MODE && console.log("could not get geoip: "+error.description);
+									listMensenByName(results,mensenliste);
+								}
+							);
+						},
+						// options
+						{
+							maximumAge: 60000,
+							timeout: 10000,
+							enableHighAccuracy: false
+						}
+					);
+				}, 3000);
+				
 			} else {
 				DEBUG_MODE && console.log("abc listing required");
 				listMensenByName(results,mensenliste);
@@ -302,7 +310,7 @@ function getMensenFromDB(listabc){
 function listMensenByName(results,mensenliste){
 
 	$('#mensen .navigationbar h1').text("Mensa auswählen");
-	
+	mensenliste.find('.locationspinner').remove();
 	var len = results.rows.length;
 	for (var i=0; i<len; i++){
 		if (results.rows.item(i).isfavorite == 1) continue;
@@ -319,6 +327,7 @@ function listMensenByDistance(results,mensenliste,location){
 	
 	$('#mensen .navigationbar h1').text("Mensen in deiner Nähe");
 	if (location.geoip == "true") mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
+	mensenliste.find('.locationspinner').remove();
 	
 	// sort by distance
 	var mensen = new Array();
