@@ -180,6 +180,12 @@ $(function(){
 	});
 	
 	
+	// header
+	$('#header .infoIcon').bind("click",function(e) {
+		e.preventDefault();
+		jQT.goTo('#imprint' ,"");
+	});
+	
 	
 	/*
 	 * Links
