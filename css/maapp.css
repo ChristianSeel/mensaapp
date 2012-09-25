@@ -58,6 +58,7 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") top left;back
 #tabbar ul li.bigger a{padding-top:36px;background-position:50% 7px;color:#fff}
 .scrollwrapper{width:100%;position:absolute;top:0;bottom:49px;z-index:15;overflow:hidden;margin-top:86px}
 .scrollpanel{width:100%;min-height:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;position:relative;padding:0 5px 15px}
+.locationspinner{margin-top:30px;padding-top:20px;background:transparent url("../img/loading2x.gif") top center no-repeat;-webkit-background-size:24px;-moz-background-size:24px;-o-background-size:24px;-ms-background-size:24px;background-size:24px}
 .blanktext{padding:15px 20px;text-shadow:0 1px 0 #fff;text-align:center}
 #speiseplan .skipdayleft,#speiseplan .skipdayright{position:absolute;left:0;top:0;width:30px;height:26px;background:transparent url("../img/icon-arrow-left.png") center center no-repeat;-webkit-background-size:26px;-moz-background-size:26px;-o-background-size:26px;-ms-background-size:26px;background-size:26px}
 #speiseplan .skipdayright{left:auto;right:0;background-image:url("../img/icon-arrow-right.png")}

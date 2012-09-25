@@ -252,46 +252,44 @@ function getMensenFromDB(listabc){
 				}
 				
 				if (i == len-1 && numberOfFavorites > 0) {
-					mensenliste.append('<div class="locationspinner"><p class="blanktext">Mensen in der Nähe suchen...<br>Bestimme Standort!</p></div>');
+					mensenliste.append('<div class="locationspinner"><p class="blanktext"><b>Mensen in der Nähe suchen...</b><br>Bestimme deinen Standort.</p></div>');
 					refreshScroll($('#mensen'), false);
 					hideSplashscreen();
 				}
 		    }
-			
+
 			
 			if (listabc == false) {
 				DEBUG_MODE && console.log("requesting device location...");
 				
-				setTimeout(function(){
-					// get curren user position
-					navigator.geolocation.getCurrentPosition(
-						function(position){
-						// success
-							var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude, geoip: "false"};
-							listMensenByDistance(results, mensenliste, geoiplocation);
-						},
-						function(error){
-						// error - fallback geoip
-							DEBUG_MODE && console.log("could not get native geolocation: "+error.message);
-							api('getgeoip',
-								function(location){
-									var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon, geoip: "true"};
-									listMensenByDistance(results, mensenliste, geoiplocation);
-								},
-								function(error){
-									DEBUG_MODE && console.log("could not get geoip: "+error.description);
-									listMensenByName(results,mensenliste);
-								}
-							);
-						},
-						// options
-						{
-							maximumAge: 60000,
-							timeout: 10000,
-							enableHighAccuracy: false
-						}
-					);
-				}, 3000);
+				// get curren user position
+				navigator.geolocation.getCurrentPosition(
+					function(position){
+					// success
+						var geoiplocation = {lat: position.coords.latitude, lon: position.coords.longitude, geoip: "false"};
+						listMensenByDistance(results, mensenliste, geoiplocation);
+					},
+					function(error){
+					// error - fallback geoip
+						DEBUG_MODE && console.log("could not get native geolocation: "+error.message);
+						api('getgeoip',
+							function(location){
+								var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon, geoip: "true"};
+								listMensenByDistance(results, mensenliste, geoiplocation);
+							},
+							function(error){
+								DEBUG_MODE && console.log("could not get geoip: "+error.description);
+								listMensenByName(results,mensenliste);
+							}
+						);
+					},
+					// options
+					{
+						maximumAge: 60000,
+						timeout: 10000,
+						enableHighAccuracy: false
+					}
+				);
 				
 			} else {
 				DEBUG_MODE && console.log("abc listing required");
