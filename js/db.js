@@ -137,12 +137,12 @@ function checkLastUpdate(tx, results) {
 		
 		// get one favorite mensa and display meals
 		db.transaction(function(tx) {
-			tx.executeSql('SELECT * FROM Mensen WHERE isfavorite = 1', [], function(tx, results) {
+			tx.executeSql('SELECT * FROM Mensen WHERE isfavorite = 1 ORDER BY mensaid', [], function(tx, results) {
 				// success function
 	
 				var len = results.rows.length;
 	
-				if (len > 0) {
+				if (len == 1) {
 					var mensa = results.rows.item(0);
 					getMenu(mensa.mensaid, getDatestamp(), false);
 					$('#speiseplan .skipdayright').removeClass('inactive');
@@ -164,9 +164,7 @@ function checkLastUpdate(tx, results) {
 
 
 
-function getMensenFromApi(cb) {
-	
-	if (cb == null) cb = function(){};
+function getMensenFromApi() {
 	
 	$('#busy').fadeIn();
 	
@@ -189,23 +187,22 @@ function getMensenFromApi(cb) {
 				
 			}, dbError, function(){
 				//success
-				getMensenFromDB(cb);
 				DEBUG_MODE && console.log("mensen successfull updated");
+				getMensenFromDB(false);
 			});
 		} else {
 			DEBUG_MODE && console.log("no mensen returned by api");
-			cb();
+			$('#busy').fadeOut();
 		}
 	  
 	}, function(results){
 		//fail
+		$('#busy').fadeOut();
 		DEBUG_MODE && console.log("mensen update failed");
 		DEBUG_MODE && console.log(results);
 		
-		cb();
-		
 		if (results.error.title) {var title = results.error.title + "";} else {var title = "Fehler";}
-		if (results.error.description) {var msg = results.error.description + "";} else {var msg = "Es ist ein unbekannter Fehler aufgetreten.";}
+		if (results.error.description) {var msg = results.error.description + "";} else {var msg = "Die verfügbaren Mensen konnten nicht vom Server abgerufen werden.";}
 		
 		navigator.notification.alert(
 		    msg,  // message
@@ -229,7 +226,9 @@ function getMensenFromDB(listabc){
 	
 	if (listabc == undefined)
 		listabc = false;
-
+	
+	DEBUG_MODE && console.log("requesting mensen from db with "+ listabc);
+	
 	db.transaction(function(tx) {
 	    tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
 	    function(tx, results){
@@ -257,6 +256,7 @@ function getMensenFromDB(listabc){
 			
 			
 			if (listabc == false) {
+				DEBUG_MODE && console.log("requesting device location...");
 				// get curren user position
 				navigator.geolocation.getCurrentPosition(
 					function(position){
@@ -266,13 +266,14 @@ function getMensenFromDB(listabc){
 					},
 					function(error){
 					// error - fallback geoip
-						DEBUG_MODE && console.log(error);
+						DEBUG_MODE && console.log("could not get native geolocation: "+error.message);
 						api('getgeoip',
 							function(location){
 								var geoiplocation = {lat: location.geoip.lat, lon: location.geoip.lon, geoip: "true"};
 								listMensenByDistance(results, mensenliste, geoiplocation);
 							},
 							function(error){
+								DEBUG_MODE && console.log("could not get geoip: "+error.description);
 								listMensenByName(results,mensenliste);
 							}
 						);
@@ -285,6 +286,7 @@ function getMensenFromDB(listabc){
 					}
 				);
 			} else {
+				DEBUG_MODE && console.log("abc listing required");
 				listMensenByName(results,mensenliste);
 			}
 		    

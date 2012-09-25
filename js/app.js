@@ -170,13 +170,22 @@ $(function(){
 	// init iScroll
 	initiscroll();
 	
-	/*
-	 * Links
-	 */
-	$('a[data-href]').bind("click",function(e) {
+	// tabbar
+	$('#tabbar a').bind("click",function(e) {
 		e.preventDefault();
 		var destination = $(this).data('href');
 		jQT.goTo(destination ,"");
+	});
+	
+	
+	
+	/*
+	 * Links
+	 */
+	$('#jqt a[data-href]').bind("click",function(e) {
+		e.preventDefault();
+		var destination = $(this).data('href');
+		jQT.goTo(destination ,"slideleft");
 	});
 	
 	
