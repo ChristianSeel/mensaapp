@@ -190,6 +190,7 @@ $(function(){
 	
 	
 	
+	
 	// Orientation callback event
 /*	$('#jqt').bind('turn', function(e, data){
 		DEBUG_MODE && console.log("Orientation changed.");
@@ -264,6 +265,13 @@ $(function(){
 	});
 	
 	
+	
+	/*
+	 *
+	 * #speiseplan
+	 *
+	 */
+	
 	// next day
 	$('#speiseplan .skipdayright').live("click",function(e) {
 		e.preventDefault();
@@ -280,9 +288,9 @@ $(function(){
 	});
 	
 	// prev day
-	$('#speiseplan .skipdayleft').live("click",function(e) {
+	$('#speiseplan .skipdayleft').live("click",function(e, goBack) {
 		e.preventDefault();
-		if ($(this).hasClass('inactive')) return false;
+		if (goBack === false && $(this).hasClass('inactive')) return false;
 		var mensaid = $('#speiseplan').data('mensaid');
 		var nextdatestamp = $('#speiseplan').data("datestamp")
 		nextdatestamp = AddDays(Datestamp2Date(nextdatestamp),-1);
@@ -291,14 +299,28 @@ $(function(){
 			return false;
 		}
 
-		if (nextdatestamp.getTime() < Datestamp2Date(getDatestamp()).getTime() ) {
+		var oldday = (nextdatestamp.getTime() < Datestamp2Date(getDatestamp()).getTime() );
+		if (oldday === true && goBack === true) {
+			jQT.goTo("#mensen","slideright");
+			return false;
+		} else if (oldday === true) {
 			$('#speiseplan .skipdayleft').addClass("inactive");
 			return false;
 		}
 		getMenu(mensaid, getDatestamp(nextdatestamp), true);
 	});
-		
 	
+	// swipe
+	$('#speiseplan').bind("swipe",function(e,info) {
+		e.preventDefault();
+		DEBUG_MODE && console.log("swipe detected");
+		
+		if (info.direction == "left") {
+			$('#speiseplan .skipdayright').trigger("click");
+		} else if (info.direction == "right") {
+			$('#speiseplan .skipdayleft').trigger("click", [true]);
+		}
+	});
 	
 
 	// refesh Icon
