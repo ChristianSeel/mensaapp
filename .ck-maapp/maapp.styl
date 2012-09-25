@@ -285,7 +285,7 @@ body, #splashscreen
 		li
 			display: block
 			float: left
-			width: 33.33%
+			width: 34%
 			height: 100%
 			a
 				display: block
@@ -317,9 +317,14 @@ body, #splashscreen
 				background-image: url(imagePath/tabbar-icon-speiseplan.png)
 			a.icon-konto
 				background-image: url(imagePath/tabbar-icon-konto.png)
+		li:last-child
+			position: absolute
+			right: 0
 		li.bigger
-			position: relative
+			position: absolute
 			top: -6px
+			left: 33.33%
+			width: 33%
 			border-radius: 4px
 			height: 58px
 			background: linear-gradient(top, #99004d, #620032)
