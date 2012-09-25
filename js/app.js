@@ -243,7 +243,9 @@ $(function(){
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("go to speiseplan "+mensaid);
 		getMenu(mensaid, getDatestamp(), true);
-		jQT.goTo("#speiseplan","slideleft");
+		setTimeout(function(){
+			jQT.goTo("#speiseplan","slideleft");
+		}, 50);
 		$('#speiseplan .skipdayright').removeClass('inactive');
 		return false;
 	});
