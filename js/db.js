@@ -486,7 +486,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 		
 		// db request meals
 		db.transaction(function(tx) {
-			tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, mealid ASC', [], function(tx, results) {
+			tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, label ASC, mealid ASC', [], function(tx, results) {
 				// success function
 	
 				var len = results.rows.length;
