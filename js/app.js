@@ -77,7 +77,7 @@ var app = {
 		
 				
 		// init database
-		initDB();
+		setTimeout(initDB,500);
 		
 		
 /*		

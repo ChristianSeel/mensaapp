@@ -448,98 +448,117 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 	$('#speiseplan .navigationbar h1').text(Datestamp2String(datestamp));
 	$('#speiseplan').data("datestamp",datestamp);
 	$('#speiseplan').data("mensaid",mensaid);
-	var speiseplan = $('#speiseplan .content').html('<div class="mealwrapper"></div>');
 	
+	if ($('#speiseplan .content .mealwrapper').length) {
+		var speiseplan = $('#speiseplan .content .mealwrapper');
+	} else {
+		var speiseplan = $('<div class="mealwrapper"></div>').appendTo('#speiseplan .content');
+		$('#speiseplan .content .blanktext').remove();
+	}
 	
-	// db request mensa
-	db.transaction(function(tx) {
-		tx.executeSql('SELECT * FROM Mensen WHERE mensaid = ' + mensaid + '', [], function(tx, results) {
-			// success function
-
-			var len = results.rows.length;
-
-			if (len == 1) {
-				var mensa = results.rows.item(0);
-				speiseplan.prepend('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck+'</span></p></div></div>');
-			}
-
-		}, dbError);
-	}, dbError);
-
+	if ($('#speiseplan .content .mensawrapper').length) {
+		var mensawrapper = $('#speiseplan .content .mensawrapper');
+	} else {
+		//var mensawrapper = $('#speiseplan .content').prepend('<div class="mensawrapper"></div>');
+		var mensawrapper = $('<div class="mensawrapper"></div>').prependTo('#speiseplan .content')
+	}
 	
+	speiseplan.fadeOut(100,function(){
+		$(this).html("")
 	
+		// db request mensa
+		db.transaction(function(tx) {
+			tx.executeSql('SELECT * FROM Mensen WHERE mensaid = ' + mensaid + '', [], function(tx, results) {
+				// success function
 	
-	// db request meals
-	db.transaction(function(tx) {
-		tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, mealid ASC', [], function(tx, results) {
-			// success function
-
-			var len = results.rows.length;
-
-			if (len == 0) {
-				if (fetchFromApi == true) {
-					$('#busy').fadeIn('fast');
-					getMealsFromApi(mensaid, datestamp);
-					return;
-				} else {
-					DEBUG_MODE && console.log("no meals returned by api");
-					$('#busy').fadeOut();
-					speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
-				/*	navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
-					alertDismissed, // callback
-					"Fehler", // title
-					'OK' // buttonName
-					);
-				*/
+				var len = results.rows.length;
+	
+				if (len == 1) {
+					var mensa = results.rows.item(0);
+					mensawrapper.html('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck+'</span></p></div></div>');
 				}
-			}
-
-
-
-			for (var i = 0; i < len; i++) {
-				meal = results.rows.item(i);
-				speiseplan.append(mealListTpl(meal));
-
-				if (i == len - 1) { // last loop
-				
-				// db request foodplan
-					db.transaction(function(tx) {
-						tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"', [], function(tx, results) {
-							// success function
-				
-							var len = results.rows.length;
-				
-							if (len == 1) {
-								
-								var foodplan = results.rows.item(0);
-								var trimmings = jQuery.parseJSON( foodplan.trimmings );
-								var tlen = trimmings.length;
-								
-								for (var j=0; j<tlen; j++){
-									speiseplan.append(trimmingListTpl(trimmings[j]));
-									if (j == tlen-1) {
+	
+			}, dbError);
+		}, dbError);
+	
+		
+		
+		
+		// db request meals
+		db.transaction(function(tx) {
+			tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, mealid ASC', [], function(tx, results) {
+				// success function
+	
+				var len = results.rows.length;
+	
+				if (len == 0) {
+					if (fetchFromApi == true) {
+						$('#busy').fadeIn('fast');
+						getMealsFromApi(mensaid, datestamp);
+						return;
+					} else {
+						DEBUG_MODE && console.log("no meals returned by api");
+						$('#busy').fadeOut();
+						speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
+						speiseplan.fadeIn('fast');
+					/*	navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
+						alertDismissed, // callback
+						"Fehler", // title
+						'OK' // buttonName
+						);
+					*/
+					}
+				}
+	
+	
+	
+				for (var i = 0; i < len; i++) {
+					meal = results.rows.item(i);
+					speiseplan.append(mealListTpl(meal));
+	
+					if (i == len - 1) { // last loop
+					
+					// db request foodplan
+						db.transaction(function(tx) {
+							tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"', [], function(tx, results) {
+								// success function
+					
+								var len = results.rows.length;
+					
+								if (len == 1) {
+									
+									var foodplan = results.rows.item(0);
+									var trimmings = jQuery.parseJSON( foodplan.trimmings );
+									var tlen = trimmings.length;
+									
+									for (var j=0; j<tlen; j++){
+										speiseplan.append(trimmingListTpl(trimmings[j]));
+										if (j == tlen-1) {
+											speiseplan.fadeIn(150);
+											refreshScroll($('#speiseplan'),true);
+											$('#busy').fadeOut();
+										}
+									}
+									
+									if (tlen == 0) {
+										speiseplan.fadeIn(150);
 										refreshScroll($('#speiseplan'),true);
 										$('#busy').fadeOut();
 									}
+									
 								}
 								
-								if (tlen == 0) {
-									refreshScroll($('#speiseplan'),true);
-									$('#busy').fadeOut();
-								}
 								
-							}
-							
-							
-				
-						}, dbError);
-					}, dbError);
 					
+							}, dbError);
+						}, dbError);
+						
+					}
 				}
-			}
-
+	
+			}, dbError);
 		}, dbError);
-	}, dbError);
+	});
 }
 
 
@@ -671,7 +690,7 @@ function getMealsFromApi(mensaid, datestamp) {
 			var msg = "Es ist ein unbekannter Fehler aufgetreten.";
 		}
 		
-		if (results.error.key == "no_meals") $('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>');
+		if (results.error.key == "no_meals") $('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>').fadeIn(150);
 
 		navigator.notification.alert(msg, // message
 		alertDismissed, // callback
