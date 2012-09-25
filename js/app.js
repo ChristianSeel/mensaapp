@@ -137,7 +137,7 @@ var app = {
 	onDeviceResume: function() {
 		 
 		DEBUG_MODE && console.log("App resumed");
-		fullDomRefresh();
+		getMensenFromDB(false);
 		 
 	}
 };
@@ -176,7 +176,6 @@ $(function(){
 	$('a[data-href]').bind("click",function(e) {
 		e.preventDefault();
 		var destination = $(this).data('href');
-		if (destination == "#mensen") getMensenFromDB(false);
 		jQT.goTo(destination ,"");
 	});
 	

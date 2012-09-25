@@ -134,6 +134,25 @@ function checkLastUpdate(tx, results) {
 		
 	} else {
 		// data is up to date
+		
+		// get one favorite mensa and display meals
+		db.transaction(function(tx) {
+			tx.executeSql('SELECT * FROM Mensen WHERE isfavorite = 1', [], function(tx, results) {
+				// success function
+	
+				var len = results.rows.length;
+	
+				if (len > 0) {
+					var mensa = results.rows.item(0);
+					getMenu(mensa.mensaid, getDatestamp(), false);
+					$('#speiseplan .skipdayright').removeClass('inactive');
+					jQT.goTo( "#speiseplan" ,"slideleft");
+				}
+	
+			}, dbError);
+		}, dbError);
+		
+		// refresh mensen list (distances)
 		getMensenFromDB();
 		
 	}
@@ -279,7 +298,9 @@ function getMensenFromDB(listabc){
 
 
 function listMensenByName(results,mensenliste){
+
 	$('#mensen .navigationbar h1').text("Mensa auswählen");
+	
 	var len = results.rows.length;
 	for (var i=0; i<len; i++){
 		if (results.rows.item(i).isfavorite == 1) continue;
@@ -294,6 +315,7 @@ function listMensenByName(results,mensenliste){
 
 function listMensenByDistance(results,mensenliste,location){
 	
+	$('#mensen .navigationbar h1').text("Mensen in deiner Nähe");
 	if (location.geoip == "true") mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
 	
 	// sort by distance
