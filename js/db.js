@@ -45,7 +45,7 @@ function dbError(error) {
 function createDBTables(tx) {
 		
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Settings (key unique, val)');
-	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, coord_lon, coord_lat, isfavorite)');
+	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, lastcheck_string, coord_lon, coord_lat, isfavorite)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Meals (mealid unique, datestamp, mensaid, name, label, price, info, recommendations)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Foodplans (key unique, mensaid, datestamp, label, trimmings)');
 	
@@ -120,7 +120,7 @@ function checkLastUpdate(tx, results) {
 		var lu_date = new Date(lastupdate*1000);
 		DEBUG_MODE && console.log("last update on: " + lu_date.getDate() + "." + (lu_date.getMonth()+1) + "." + lu_date.getFullYear() + " " + lu_date.getHours() + ":" + lu_date.getMinutes() + ":" + lu_date.getSeconds() );
 		
-		if (lastupdate < (getTimestamp()-60*60*24* 30)) doUpdate = true;
+		if (lastupdate < (getTimestamp()-60*60*24* 30) && networkState==1) doUpdate = true;
 		
 	} else {
 		doUpdate = true;
@@ -180,7 +180,7 @@ function getMensenFromApi() {
 					var mensa = results.mensen[i];
 					
 					tx.executeSql('INSERT OR IGNORE INTO Mensen (mensaid) VALUES ('+mensa.mensaid+')');
-					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, city=?, lastcheck=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.city, mensa.lastcheck, mensa.coord.lon, mensa.coord.lat]);
+					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, city=?, lastcheck=?, lastcheck_string=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.city, mensa.lastcheck, mensa.lastcheck_string, mensa.coord.lon, mensa.coord.lat]);
 				}
 				
 				tx.executeSql('UPDATE Settings SET val=? WHERE key="lastupdate"', [getTimestamp()]);
@@ -510,96 +510,102 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 			tx.executeSql('SELECT * FROM Mensen WHERE mensaid = ' + mensaid + '', [], function(tx, results) {
 				// success function
 	
-				var len = results.rows.length;
+				var mensalen = results.rows.length;
 	
-				if (len == 1) {
+				if (mensalen == 1) {
 					var mensa = results.rows.item(0);
-					mensawrapper.html('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck+'</span></p></div></div>');
-				}
-	
-			}, dbError);
-		}, dbError);
-	
-		
-		
-		
-		// db request meals
-		db.transaction(function(tx) {
-			tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, label ASC, mealid ASC', [], function(tx, results) {
-				// success function
-	
-				var len = results.rows.length;
-				DEBUG_MODE && console.log(len + " meals found");
-				
-				if (len == 0) {
-					if (fetchFromApi == true) {
+					mensawrapper.html('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck_string+'</span></p></div></div>');
+					if (fetchFromApi === true && mensa.lastcheck < (getTimestamp()-(60*60*24)) && networkState==1) {
+						DEBUG_MODE && console.log("foodplan older than 24h -> get new foodplan from api");
 						$('#busy').fadeIn('fast');
 						getMealsFromApi(mensaid, datestamp);
 						return;
-					} else {
-						DEBUG_MODE && console.log("no meals returned by api");
-						$('#busy').fadeOut();
-						speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
-						speiseplan.fadeIn('fast');
-						refreshScroll($('#speiseplan'),true);
-					/*	navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
-						alertDismissed, // callback
-						"Fehler", // title
-						'OK' // buttonName
-						);
-					*/
-						return;
 					}
 				}
-	
-	
-	
-				for (var i = 0; i < len; i++) {
-					meal = results.rows.item(i);
-					speiseplan.append(mealListTpl(meal));
-	
-					if (i == len - 1) { // last loop
-					
-					// db request foodplan
-						db.transaction(function(tx) {
-							tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"', [], function(tx, results) {
-								// success function
-					
-								var len = results.rows.length;
-					
-								if (len == 1) {
-									
-									var foodplan = results.rows.item(0);
-									var trimmings = jQuery.parseJSON( foodplan.trimmings );
-									var tlen = trimmings.length;
-									
-									for (var j=0; j<tlen; j++){
-										speiseplan.append(trimmingListTpl(trimmings[j]));
-										if (j == tlen-1) {
-											speiseplan.fadeIn(150);
-											refreshScroll($('#speiseplan'),true);
-											$('#busy').fadeOut();
-										}
-									}
-									
-									if (tlen == 0) {
-										speiseplan.fadeIn(150);
-										refreshScroll($('#speiseplan'),true);
-										$('#busy').fadeOut();
-									}
-									
-								}
-								
-								
-					
-							}, dbError);
-						}, dbError);
+
+
+				// db request meals
+				db.transaction(function(tx) {
+					tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations DESC, label ASC, mealid ASC', [], function(tx, results) {
+						// success function
+			
+						var len = results.rows.length;
+						DEBUG_MODE && console.log(len + " meals found");
 						
-					}
-				}
-	
+						if (len == 0) {
+							if (fetchFromApi == true && networkState==1) {
+								$('#busy').fadeIn('fast');
+								getMealsFromApi(mensaid, datestamp);
+								return;
+							} else {
+								DEBUG_MODE && console.log("no meals returned by api");
+								$('#busy').fadeOut();
+								speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
+								speiseplan.fadeIn('fast');
+								refreshScroll($('#speiseplan'),true);
+							/*	navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
+								alertDismissed, // callback
+								"Fehler", // title
+								'OK' // buttonName
+								);
+							*/
+								return;
+							}
+						}
+			
+			
+			
+						for (var i = 0; i < len; i++) {
+							meal = results.rows.item(i);
+							speiseplan.append(mealListTpl(meal));
+			
+							if (i == len - 1) { // last loop
+							
+							// db request foodplan
+								db.transaction(function(tx) {
+									tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"', [], function(tx, results) {
+										// success function
+							
+										var len = results.rows.length;
+							
+										if (len == 1) {
+											
+											var foodplan = results.rows.item(0);
+											var trimmings = jQuery.parseJSON( foodplan.trimmings );
+											var tlen = trimmings.length;
+											
+											for (var j=0; j<tlen; j++){
+												speiseplan.append(trimmingListTpl(trimmings[j]));
+												if (j == tlen-1) {
+													speiseplan.fadeIn(150);
+													refreshScroll($('#speiseplan'),true);
+													$('#busy').fadeOut();
+												}
+											}
+											
+											if (tlen == 0) {
+												speiseplan.fadeIn(150);
+												refreshScroll($('#speiseplan'),true);
+												$('#busy').fadeOut();
+											}
+											
+										}
+										
+										
+							
+									}, dbError);
+								}, dbError);
+								
+							}
+						}
+			
+					}, dbError);
+				}, dbError);
+
+
 			}, dbError);
 		}, dbError);
+	
 	});
 }
 
@@ -673,7 +679,10 @@ function getMealsFromApi(mensaid, datestamp) {
 		var days = results.days.length;
 
 		db.transaction(function(tx) {
-
+			
+			// update lastcheck value
+			tx.executeSql('UPDATE Mensen SET lastcheck=?, lastcheck_string=? WHERE mensaid = "' + mensaid + '"', [results.mensa.lastcheck, results.mensa.lastcheck_string]);
+			
 			for (var i = 0; i < results.days.length; i++) {
 				var foodplan = results.days[i];
 				// foodplan
