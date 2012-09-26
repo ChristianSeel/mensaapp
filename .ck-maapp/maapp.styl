@@ -130,6 +130,16 @@ body, #splashscreen
 		color: #555
 		font-weight: 600
 
+
+#blocker
+	z-index: 9500
+	display: none
+	position: absolute
+	top: 0
+	left: 0
+	width: 100%
+	height: 100%
+
 	
 #busy
 	z-index: 9000
@@ -385,7 +395,7 @@ body, #splashscreen
 
 .scrollrefresh
 	#pullDown
-		display: inline-block
+		display: block
 	.content
 		margin-top: -20px
 
@@ -394,10 +404,9 @@ body, #splashscreen
 	
 #pullDown .pullDownIcon
 	display:block
-	float:left
 	width:30px
 	height:30px
-	margin-left: 20px
+	margin-left: 10px
 	margin-right: 6px
 	background: url(imagePath/pull-icon@2x.png) center center no-repeat
 	background-size: 24px
@@ -415,8 +424,11 @@ body, #splashscreen
 
 #pullDown .pullDownLabel
 	display: block
-	padding: 10px 0 0 0
+	padding: 10px 0 0 43px
 	font-weight: 600
+	position: absolute
+	top: 0
+	left: 0
 
 
 /*
@@ -524,12 +536,31 @@ body, #splashscreen
 	border-bottom-left-radius: 4px
 	
 
+.meal.showInfo
+	left: -87%
 
 .meal
+	-webkit-transition-property:left
+	-webkit-transition-duration:500ms
+	h2, .h2
+		margin-top: 0
+		padding-right: 27px
 	.info
-		font-style: italic
+		position: absolute
+		left: 100%
+		width: 77%
+		text-align: left
 	.label
 		font-weight: 600
 	.recommendations
 		padding: 4px 15px
 		background: #ddd
+	.infoIcon
+		display: block
+		position: absolute
+		top: 0
+		right: 0
+		width: 40px
+		height: 43px
+		background: transparent url(imagePath/infoIcon-dark@2x.png) center center no-repeat
+		background-size: 20px

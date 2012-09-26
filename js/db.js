@@ -45,7 +45,8 @@ function dbError(error) {
 function createDBTables(tx) {
 		
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Settings (key unique, val)');
-	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, lastcheck_string, coord_lon, coord_lat, isfavorite)');
+	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, lastcheck_string, coord_lon, coord_lat)');
+	tx.executeSql('CREATE TABLE IF NOT EXISTS FavoriteMensen (mensaid unique, isfavorite)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Meals (mealid unique, datestamp, mensaid, name, label, price, info, recommendations)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Foodplans (key unique, mensaid, datestamp, label, trimmings)');
 	
@@ -137,7 +138,7 @@ function checkLastUpdate(tx, results) {
 		
 		// get one favorite mensa and display meals
 		db.transaction(function(tx) {
-			tx.executeSql('SELECT * FROM Mensen WHERE isfavorite = 1 ORDER BY mensaid', [], function(tx, results) {
+			tx.executeSql('SELECT * FROM FavoriteMensen WHERE isfavorite = 1 ORDER BY mensaid', [], function(tx, results) {
 				// success function
 	
 				var len = results.rows.length;
@@ -166,7 +167,7 @@ function checkLastUpdate(tx, results) {
 
 function getMensenFromApi() {
 	
-	$('#busy').fadeIn();
+	//$('#busy').fadeIn();
 	
 	api('getmensen', function(results){
 		//success
@@ -181,6 +182,8 @@ function getMensenFromApi() {
 					
 					tx.executeSql('INSERT OR IGNORE INTO Mensen (mensaid) VALUES ('+mensa.mensaid+')');
 					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, city=?, lastcheck=?, lastcheck_string=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.city, mensa.lastcheck, mensa.lastcheck_string, mensa.coord.lon, mensa.coord.lat]);
+					
+					tx.executeSql('INSERT OR IGNORE INTO FavoriteMensen (mensaid,isfavorite) VALUES ('+mensa.mensaid+',0)');
 				}
 				
 				tx.executeSql('UPDATE Settings SET val=? WHERE key="lastupdate"', [getTimestamp()]);
@@ -193,11 +196,13 @@ function getMensenFromApi() {
 		} else {
 			DEBUG_MODE && console.log("no mensen returned by api");
 			$('#busy').fadeOut();
+			$('#blocker').hide();
 		}
 	  
 	}, function(results){
 		//fail
 		$('#busy').fadeOut();
+		$('#blocker').hide();
 		DEBUG_MODE && console.log("mensen update failed");
 		DEBUG_MODE && console.log(results);
 		
@@ -230,13 +235,15 @@ function getMensenFromDB(listabc){
 	DEBUG_MODE && console.log("requesting mensen from db with "+ listabc);
 	
 	db.transaction(function(tx) {
-	    tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
+	 //   tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
+	    tx.executeSql('SELECT * FROM Mensen LEFT OUTER JOIN FavoriteMensen ON Mensen.mensaid = FavoriteMensen.mensaid ORDER BY org ASC, name ASC' , [],
 	    function(tx, results){
 	    //success
 	    	
 			var len = results.rows.length;
 			
 			if (len == 0) {
+				$('#busy').fadeIn();
 				getMensenFromApi();
 				return true;
 			}
@@ -254,6 +261,7 @@ function getMensenFromDB(listabc){
 				if (i == len-1 && numberOfFavorites > 0) {
 					mensenliste.append('<div class="locationspinner"><p class="blanktext"><b>Mensen in der Nähe suchen...</b><br>Bestimme deinen Standort.</p></div>');
 					refreshScroll($('#mensen'), false);
+					$('#blocker').hide();
 					hideSplashscreen();
 				}
 		    }
@@ -285,7 +293,7 @@ function getMensenFromDB(listabc){
 					},
 					// options
 					{
-						maximumAge: 60000,
+						maximumAge: 5000,
 						timeout: 10000,
 						enableHighAccuracy: false
 					}
@@ -316,6 +324,7 @@ function listMensenByName(results,mensenliste){
 		if (i == (len - 1)) {
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
+			$('#blocker').hide();
 			hideSplashscreen();
 		}
 	}
@@ -352,6 +361,7 @@ function listMensenByDistance(results,mensenliste,location){
 			mensenliste.append('<div class="square linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
+			$('#blocker').hide();
 			hideSplashscreen(); // hide dom splashscreen on init
 			return;
 		}
@@ -612,8 +622,11 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 
 
 function mealListTpl(data){
-	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
+	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'">';
 	
+	if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="infoIcon"></span><p class="info blanktext">Infos: '+data.info+'</p>';
+	
+	tpl += '<div class="innerwrapper">';
 	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
 	
 	tpl += '<h2>'+data.name+' </h2><p>';
@@ -628,8 +641,6 @@ function mealListTpl(data){
 			tpl = tpl.substr(0, tpl.length -3);
 		tpl +='</span><br>';
 	}
-	
-	if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
 	
 	tpl = tpl.substr(0, tpl.length -4);
 	
@@ -719,7 +730,7 @@ function getMealsFromApi(mensaid, datestamp) {
 		}, dbError, function() {
 			//success
 			getMenu(mensaid, datestamp, false);
-			// endlosscheife wenn geforderten daten nicht in der api waren..
+			$('#blocker').hide();
 			DEBUG_MODE && console.log("meals successfull updated");
 		});
 
@@ -728,7 +739,7 @@ function getMealsFromApi(mensaid, datestamp) {
 		DEBUG_MODE && console.log("meals update failed");
 		DEBUG_MODE && console.log(results);
 		$('#busy').fadeOut();
-
+		$('#blocker').hide();
 		
 		if (results.error.title) {
 			var title = results.error.title + "";
@@ -771,16 +782,28 @@ function getMealsFromApi(mensaid, datestamp) {
 
 function pullDownAction (scroll,$wrapper) {
 			
-			if ($wrapper.parent().attr('id') == 'events') {
-				getEventsFromApi();
-				
-			} else {
+			switch ($wrapper.parent().attr('id')) {
+			
+			case "speiseplan":
+				getMealsFromApi($('#speiseplan').data('mensaid'), $('#speiseplan').data('datestamp'));
+				$('#blocker').show(); //block UI during request
+				break;
+			
+			
+			case "mensen":
+				getMensenFromApi();
+				$('#blocker').show(); //block UI during request
+				break;
+			
+			
+			default: 
 				setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
 						
 					alert('yeah! 42!');
 						
 					scroll.refresh();		// Remember to refresh when contents are loaded (ie: on ajax completion)
 				}, 1500);	// <-- Simulate network congestion, remove setTimeout from production!
+				break;
 			}
 				
 }

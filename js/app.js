@@ -333,6 +333,28 @@ $(function(){
 	});
 	
 
+	$('.meal.showInfo').live("click",function(e){
+		e.preventDefault();
+		$(this).removeClass('showInfo');
+	});
+	
+	$('.meal .infoIcon').live("click",function(e){
+		e.preventDefault();
+		var parent = $(this).parents('.square');
+		if (!parent.hasClass('showInfo') === true) {
+			$(this).parents('.content').find('.meal.showInfo').removeClass('showInfo');
+			parent.addClass('showInfo');
+		}
+	});
+
+
+
+
+
+
+
+
+
 	// refesh Icon
 	$('#events .refreshIcon').live("click",function(e) {
 	    e.preventDefault();
@@ -384,14 +406,14 @@ $(function(){
 
 function addMensaToFavorite(mensaid) {
 	db.transaction(function(tx){
-		tx.executeSql('UPDATE Mensen SET isfavorite=1 WHERE mensaid='+mensaid);
+		tx.executeSql('UPDATE FavoriteMensen SET isfavorite=1 WHERE mensaid='+mensaid);
 	}, dbError, function(){});
 	return true;
 }
 
 function removeMensaFromFavorite(mensaid) {
 	db.transaction(function(tx){
-		tx.executeSql('UPDATE Mensen SET isfavorite=0 WHERE mensaid='+mensaid);
+		tx.executeSql('UPDATE FavoriteMensen SET isfavorite=0 WHERE mensaid='+mensaid);
 	}, dbError, function(){});
 	return true;
 }
@@ -599,7 +621,7 @@ function api(url, success, fail) {
 	$.getJSONP({
 			url: api_url+url,
 			cache: false,
-			timeout: 40000,
+			timeout: 30000,
 			success: function(response){
 			
 				if (DEBUG_MODE && response.debug) console.log("Debug response: "+response.debug);

@@ -47,8 +47,8 @@
 		<script type="text/javascript">
 			
 			var DEBUG_MODE = true;
-			var appversion = "0.5.3";
-			var requiredDBVersion = 16;
+			var appversion = "0.5.6";
+			var requiredDBVersion = 19;
 			
 			var base_url = "http://mensaapp.de/";
 			var static_url = "http://static.mensaapp.de/";
@@ -98,6 +98,7 @@
 		<div id="fb-root"></div>
 		<div id="splashscreen"><div class="spinner"></div><span id="splashappversion"></span></div>
 		<div id="busy"><div class="wrapper"><div class="spinner"></div><span>Bitte warten...</span></div></div>
+		<div id="blocker"></div>
 		<div class="hidden">
 			<img src="img/icon-star-active.png" alt="icon-star-active" width="42" height="42">
 			<img src="img/icon-star.png" alt="icon-star" width="42" height="42">
@@ -150,10 +151,12 @@
 					<span>
 				</div>
 				
-				<div class="scrollwrapper">
-					<div class="content scrollpanel">
-											
-					
+				<div class="scrollwrapper scrollrefresh">
+					<div class="scrollpanel">
+						<div id="pullDown"><span class="pullDownIcon"></span><span class="pullDownLabel">Zum Aktualisieren herunterziehen</span></div>					
+						<div class="content">
+						
+						</div>
 					</div>
 				</div>
 			</div> <!-- mensen -->

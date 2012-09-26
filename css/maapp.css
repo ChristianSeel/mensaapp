@@ -25,6 +25,7 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 #splashscreen{z-index:9999;display:block;position:absolute;top:0;left:0;width:100%;height:100%;}
 #splashscreen #splashappversion{position:absolute;bottom:10px;right:10px;font-size:11px;color:#777}
 #splashscreen .spinnertext{color:#555;font-weight:600}
+#blocker{z-index:9500;display:none;position:absolute;top:0;left:0;width:100%;height:100%}
 #busy{z-index:9000;display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);background:-webkit-gradient(radial,center center,0,center center,100%,color-stop(0%,rgba(0,0,0,0.5)),color-stop(100%,rgba(0,0,0,0.8)));background:-webkit-radial-gradient(center,ellipse cover,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.8) 100%);background:radial-gradient(ellipse at center,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.8) 100%);}
 #busy .wrapper{height:150px;width:200px;margin:-100px auto;position:relative;top:50%;}
 #busy .wrapper .spinner{position:static;margin:20px auto}
@@ -65,14 +66,14 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .scrollwrapper{width:100%;position:absolute;top:0;bottom:49px;z-index:15;overflow:hidden;margin-top:86px}
 .scrollpanel{width:100%;min-height:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;position:relative;padding:0 5px 15px}
 #pullDown{display:none;width:100%;height:30px;position:relative;top:-27px;margin-top:0;margin-bottom:-30px;-webkit-transition-property:margin;-webkit-transition-duration:500ms}
-.scrollrefresh #pullDown{display:inline-block}
+.scrollrefresh #pullDown{display:block}
 .scrollrefresh .content{margin-top:-20px}
 #pullDown.loading{margin-top:37px}
-#pullDown .pullDownIcon{display:block;float:left;width:30px;height:30px;margin-left:20px;margin-right:6px;background:url("../img/pull-icon@2x.png") center center no-repeat;-webkit-background-size:24px;-moz-background-size:24px;-o-background-size:24px;-ms-background-size:24px;background-size:24px;-webkit-transition-property:-webkit-transform;-webkit-transition-duration:250ms}
+#pullDown .pullDownIcon{display:block;width:30px;height:30px;margin-left:10px;margin-right:6px;background:url("../img/pull-icon@2x.png") center center no-repeat;-webkit-background-size:24px;-moz-background-size:24px;-o-background-size:24px;-ms-background-size:24px;background-size:24px;-webkit-transition-property:-webkit-transform;-webkit-transition-duration:250ms}
 #pullDown .pullDownIcon{-webkit-transform:rotate(0) translateZ(0)}
 #pullDown.flip .pullDownIcon,#pullDown.loading .pullDownIcon{-webkit-transform:rotate(-180deg) translateZ(0)}
 #pullDown.loading .pullDownIcon{background-image:url("../img/loading2x.gif")}
-#pullDown .pullDownLabel{display:block;padding:10px 0 0 0;font-weight:600}
+#pullDown .pullDownLabel{display:block;padding:10px 0 0 43px;font-weight:600;position:absolute;top:0;left:0}
 .locationspinner{margin-top:30px;padding-top:20px;background:transparent url("../img/loading2x.gif") top center no-repeat;-webkit-background-size:24px;-moz-background-size:24px;-o-background-size:24px;-ms-background-size:24px;background-size:24px}
 .blanktext{padding:15px 20px;text-shadow:0 1px 0 #fff;text-align:center}
 #speiseplan .skipdayleft,#speiseplan .skipdayright{position:absolute;left:0;top:0;width:30px;height:26px;background:transparent url("../img/icon-arrow-left.png") center center no-repeat;-webkit-background-size:26px;-moz-background-size:26px;-o-background-size:26px;-ms-background-size:26px;background-size:26px}
@@ -91,6 +92,10 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .mensa .org{font-weight:600}
 .mensainfo .innerwrapper{padding-left:20px}
 .mensainfo:after{content:"";display:block;position:absolute;top:0;left:0;height:100%;width:6px;background:#78003c;-webkit-border-top-left-radius:4px;-webkit-border-bottom-left-radius:4px;-moz-border-radius-topleft:4px;-moz-border-radius-bottomleft:4px;border-top-left-radius:4px;border-bottom-left-radius:4px}
-.meal .info{font-style:italic}
+.meal.showInfo{left:-87%}
+.meal{-webkit-transition-property:left;-webkit-transition-duration:500ms;}
+.meal h2,.meal .h2{margin-top:0;padding-right:27px}
+.meal .info{position:absolute;left:100%;width:77%;text-align:left}
 .meal .label{font-weight:600}
 .meal .recommendations{padding:4px 15px;background:#ddd}
+.meal .infoIcon{display:block;position:absolute;top:0;right:0;width:40px;height:43px;background:transparent url("../img/infoIcon-dark@2x.png") center center no-repeat;-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px}
