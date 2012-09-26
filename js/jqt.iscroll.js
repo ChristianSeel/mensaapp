@@ -17,7 +17,11 @@
     		setTimeout(function () {
 				if (scroll !== undefined && scroll !== null) {
 	    			if (jumpToTop == true) {
-		    			scroll.scrollTo(0,0,500);
+	    				if ($wrapper.hasClass("scrollrefresh")) {
+		    				scroll.scrollTo(0,0,500);
+		    			} else {
+			    			scroll.scrollTo(0,0,500);
+		    			}
 		    			setTimeout(function(){scroll.refresh();},501);
 	    			} else {
 		    			scroll.refresh();
@@ -49,7 +53,7 @@
     	    if ($wrapper.hasClass("scrollrefresh")) {
     	    	pullDownEl =  $wrapper.find('#pullDown')[0];
     	    	pullDownOffset = pullDownEl.offsetHeight;
-    	    	if (pullDownOffset == 0) pullDownOffset = 51;
+    	    	if (pullDownOffset == 0) pullDownOffset = 0;
     	    	
     	    	options = {
     	    		useTransition: true,
@@ -67,12 +71,12 @@
     	    			}
     	    		},
     	    		onScrollMove: function () {
-    	    			if (this.y > 5 && !pullDownEl.className.match('flip')) {
+    	    			if (this.y > 30 && !pullDownEl.className.match('flip')) {
     	    				
     	    				pullDownEl.className = 'flip';
     	    				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Zum Aktualisieren loslassen';
     	    				this.minScrollY = 0;
-    	    			} else if (this.y < 5 && pullDownEl.className.match('flip')) {
+    	    			} else if (this.y < 30 && pullDownEl.className.match('flip')) {
     	    				pullDownEl.className = '';
     	    				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Zum Aktualisieren herunterziehen';
     	    				this.minScrollY = -pullDownOffset;

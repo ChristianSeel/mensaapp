@@ -73,7 +73,7 @@ var app = {
 		
 		
 		// hide app-splashscreen when ready
-		if (devicePlatform != "android") cordova.exec(null, null, "SplashScreen", "hide", []);
+	//	if (devicePlatform != "android") cordova.exec(null, null, "SplashScreen", "hide", []);
 		
 				
 		// init database

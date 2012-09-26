@@ -372,7 +372,40 @@ body, #splashscreen
 	position: relative
 	padding: 0 5px 15px
 
+#pullDown
+	height: 30px
+	margin-top: -30px
+	-webkit-transition-property:margin
+	-webkit-transition-duration:500ms
 
+#pullDown.loading
+	margin-top: 10px
+	
+#pullDown .pullDownIcon
+	display:block
+	float:left
+	width:30px
+	height:30px
+	margin-left: 20px
+	margin-right: 6px
+	background: url(imagePath/pull-icon@2x.png) center center no-repeat
+	background-size: 24px
+	-webkit-transition-property:-webkit-transform
+	-webkit-transition-duration:250ms
+
+#pullDown .pullDownIcon
+	-webkit-transform:rotate(0deg) translateZ(0)
+
+#pullDown.flip .pullDownIcon, #pullDown.loading .pullDownIcon
+	-webkit-transform:rotate(-180deg) translateZ(0)
+
+#pullDown.loading .pullDownIcon
+	background-image: url(imagePath/loading2x.gif)
+
+#pullDown .pullDownLabel
+	display: block
+	padding: 10px 0 0 0
+	font-weight: 600
 
 
 /*
