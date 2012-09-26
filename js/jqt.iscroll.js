@@ -17,11 +17,7 @@
     		setTimeout(function () {
 				if (scroll !== undefined && scroll !== null) {
 	    			if (jumpToTop == true) {
-	    				if ($wrapper.hasClass("scrollrefresh")) {
-		    				scroll.scrollTo(0,0,500);
-		    			} else {
-			    			scroll.scrollTo(0,0,500);
-		    			}
+			    		scroll.scrollTo(0,0,500);
 		    			setTimeout(function(){scroll.refresh();},501);
 	    			} else {
 		    			scroll.refresh();
@@ -52,8 +48,9 @@
 			
     	    if ($wrapper.hasClass("scrollrefresh")) {
     	    	pullDownEl =  $wrapper.find('#pullDown')[0];
-    	    	pullDownOffset = pullDownEl.offsetHeight;
-    	    	if (pullDownOffset == 0) pullDownOffset = 0;
+    	    	//pullDownOffset = pullDownEl.offsetHeight;
+    	    	//if (pullDownOffset == 0) pullDownOffset = 0;
+    	    	pullDownOffset = 0;
     	    	
     	    	options = {
     	    		useTransition: true,

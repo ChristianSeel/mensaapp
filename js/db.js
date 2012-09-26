@@ -477,6 +477,14 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 	if (datestamp == getDatestamp()) $('#speiseplan .skipdayleft').addClass("inactive");
 	
 	$('#speiseplan .navigationbar h1').text(Datestamp2String(datestamp));
+	
+	if (!$('#speiseplan .scrollwrapper').hasClass('scrollrefresh')) {
+		$('#speiseplan .scrollwrapper').addClass('scrollrefresh');
+		var scroll = $('#speiseplan .scrollwrapper').data(KEY_ISCROLL_OBJ);
+		scroll.destroy();
+		$('#speiseplan .scrollwrapper').data(KEY_ISCROLL_OBJ,null)
+	}
+	
 	$('#speiseplan').data("datestamp",datestamp);
 	$('#speiseplan').data("mensaid",mensaid);
 	
@@ -521,7 +529,8 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				// success function
 	
 				var len = results.rows.length;
-	
+				DEBUG_MODE && console.log(len + " meals found");
+				
 				if (len == 0) {
 					if (fetchFromApi == true) {
 						$('#busy').fadeIn('fast');

@@ -73,7 +73,7 @@ var app = {
 		
 		
 		// hide app-splashscreen when ready
-	//	if (devicePlatform != "android") cordova.exec(null, null, "SplashScreen", "hide", []);
+		if (devicePlatform != "android") cordova.exec(null, null, "SplashScreen", "hide", []);
 		
 				
 		// init database
@@ -567,9 +567,7 @@ function alertDismissed(){DEBUG_MODE && console.log("alert dismissed");}
 
 function hideSplashscreen() {
 	// hide dom-splashscreen when done
-	setTimeout(function(){
-		$('#splashscreen').fadeOut();
-	}, 2000)
+	$('#splashscreen').fadeOut();
 	
 }
 
