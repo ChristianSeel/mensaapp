@@ -99,3 +99,4 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .meal .label{font-weight:600}
 .meal .recommendations{padding:4px 15px;background:#ddd}
 .meal .infoIcon{display:block;position:absolute;top:0;right:0;width:40px;height:43px;background:transparent url("../img/infoIcon-dark@2x.png") center center no-repeat;-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px}
+.trimming h3{margin-top:5px}

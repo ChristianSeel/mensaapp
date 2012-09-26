@@ -502,8 +502,8 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 		var speiseplan = $('#speiseplan .content .mealwrapper');
 	} else {
 		var speiseplan = $('<div class="mealwrapper"></div>').appendTo('#speiseplan .content');
-		$('#speiseplan .content .blanktext').remove();
 	}
+	$('#speiseplan .content .blanktext').remove();
 	
 	if ($('#speiseplan .content .mensawrapper').length) {
 		var mensawrapper = $('#speiseplan .content .mensawrapper');
@@ -651,28 +651,30 @@ function mealListTpl(data){
 
 
 function trimmingListTpl(data){
-	var tpl = '<div class="square trimming" data-mealid="'+data.mealid+'"><div class="innerwrapper">';
+	DEBUG_MODE && console.log(data);
+	var tpl = '<div class="square trimming"><div class="innerwrapper">';
 	
-	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
+	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p class="label bold">'+data.label+'</p>';
 	
-	tpl += '<h3>'+data.name+' </h3><p>';
-	
-	
-	if (typeof data.price !== "undefined" && data.price !== "undefined" && data.price !== "") {
-		var price = jQuery.parseJSON( data.price );
-		tpl += '<span class="price">';
-			for (p in price) {
-				tpl += p + ': '+ price[p] + ' | ';
-			}
-			tpl = tpl.substr(0, tpl.length -3);
-		tpl +='</span><br>';
+	for (var i = 0; i < data.meals.length; i++) {
+		var trimming = data.meals[i];
+		DEBUG_MODE && console.log(trimming);
+		tpl += '<h3>'+trimming.name+' </h3>';
+		
+		if (typeof trimming.price !== "undefined" && trimming.price !== "undefined" && trimming.price !== "") {
+			//var price = jQuery.parseJSON( data.price );
+			tpl += '<p class="price">';
+				for (p in trimming.price) {
+					tpl += p + ': '+ trimming.price[p] + ' | ';
+				}
+				tpl = tpl.substr(0, tpl.length -3);
+			tpl +='</p>';
+		}
+		
+		if (typeof trimming.info !== "undefined" && trimming.info !== "undefined" && trimming.info !== "") tpl += '<p class="info">Infos: '+trimming.info+'</p>';
 	}
 	
-	if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="info">Infos: '+data.info+'</span><br>';
-	
-	tpl = tpl.substr(0, tpl.length -4);
-	
-	tpl += '</p></div></div>';
+	tpl += '</div></div>';
 	
 	return tpl;
 }
