@@ -50,17 +50,17 @@
     	    	pullDownEl =  $wrapper.find('#pullDown')[0];
     	    	//pullDownOffset = pullDownEl.offsetHeight;
     	    	//if (pullDownOffset == 0) pullDownOffset = 0;
-    	    	pullDownOffset = 1;
+    	    	pullDownOffset = 0;
     	    	
     	    	options = {
     	    		useTransition: true,
-    	    		topOffset: pullDownOffset,
+    	    		//topOffset: pullDownOffset,
     	    		
     	    		hScroll: false,
 					hScrollbar: false,
 					fixedScrollbar: false,
 					lockDirection: false,
-    	    		
+					
     	    		onRefresh: function () {
     	    			if (pullDownEl.className.match('loading')) {
     	    				pullDownEl.className = '';
@@ -72,11 +72,11 @@
     	    				
     	    				pullDownEl.className = 'flip';
     	    				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Zum Aktualisieren loslassen';
-    	    				this.minScrollY = 0;
+    	    				//this.minScrollY = 0;
     	    			} else if (this.y < 30 && pullDownEl.className.match('flip')) {
     	    				pullDownEl.className = '';
     	    				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Zum Aktualisieren herunterziehen';
-    	    				this.minScrollY = -pullDownOffset;
+    	    				//this.minScrollY = -pullDownOffset;
     	    			}
     	    		},
     	    		onScrollEnd: function () {
@@ -87,6 +87,7 @@
     	    				pullDownAction(scroll,$wrapper);	// Execute custom function (ajax call?)
     	    			}
     	    		}
+    	    		
     	    		
     	    	};
     	    	

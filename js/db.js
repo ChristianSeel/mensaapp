@@ -781,7 +781,7 @@ function getMealsFromApi(mensaid, datestamp) {
 
 
 function pullDownAction (scroll,$wrapper) {
-			
+	setTimeout(function(){
 			switch ($wrapper.parent().attr('id')) {
 			
 			case "speiseplan":
@@ -805,6 +805,6 @@ function pullDownAction (scroll,$wrapper) {
 				}, 1500);	// <-- Simulate network congestion, remove setTimeout from production!
 				break;
 			}
-				
+	}, 1000);			
 }
 		

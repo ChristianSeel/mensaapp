@@ -383,6 +383,13 @@ body, #splashscreen
 	position: relative
 	padding: 0 5px 15px
 
+.scrollrefresh
+	#pullDown
+		display: block
+	.content
+		margin-top: -20px
+
+
 #pullDown
 	display: none
 	width: 100%
@@ -393,12 +400,7 @@ body, #splashscreen
 	margin-bottom: -30px
 	-webkit-transition-property:margin-top
 	-webkit-transition-duration:500ms
-
-.scrollrefresh
-	#pullDown
-		display: block
-	.content
-		margin-top: -20px
+	-webkit-transform:translate3d(0,0,0)
 
 #pullDown.loading
 	margin-top: 37px
@@ -542,6 +544,7 @@ body, #splashscreen
 	width: 100%
 	overflow: hidden
 	margin-top: -10px
+	
 
 .meal.showInfo
 	left: -87%
