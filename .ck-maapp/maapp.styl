@@ -376,6 +376,7 @@ body, #splashscreen
 	margin-top: 86px
 
 .scrollpanel
+	position: relative
 	width: 100%
 	min-height: 100%
 	box-sizing:border-box
@@ -390,7 +391,7 @@ body, #splashscreen
 	top: -27px
 	margin-top: 0
 	margin-bottom: -30px
-	-webkit-transition-property:margin
+	-webkit-transition-property:margin-top
 	-webkit-transition-duration:500ms
 
 .scrollrefresh
@@ -536,12 +537,20 @@ body, #splashscreen
 	border-bottom-left-radius: 4px
 	
 
+.mealwrapper
+	position: relative
+	width: 100%
+	overflow: hidden
+	margin-top: -10px
+
 .meal.showInfo
 	left: -87%
+
 
 .meal
 	-webkit-transition-property:left
 	-webkit-transition-duration:500ms
+	left: 0
 	h2, .h2
 		margin-top: 0
 		padding-right: 27px

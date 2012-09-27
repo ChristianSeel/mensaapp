@@ -336,14 +336,26 @@ $(function(){
 	$('.meal.showInfo').live("click",function(e){
 		e.preventDefault();
 		$(this).removeClass('showInfo');
+	/*	$(this).animate({
+			left: '0',
+		}, 300);
+	*/
 	});
 	
 	$('.meal .infoIcon').live("click",function(e){
 		e.preventDefault();
-		var parent = $(this).parents('.square');
+		var parent = $(this).parent('.square');
 		if (!parent.hasClass('showInfo') === true) {
-			$(this).parents('.content').find('.meal.showInfo').removeClass('showInfo');
+			$(this).parent('.square').siblings().removeClass('showInfo');
+		/*	$(this).parent('.square').siblings().animate({
+				left: '0',
+			}, 300);
+		*/
 			parent.addClass('showInfo');
+		/*	parent.animate({
+				left: '-87%',
+			}, 500);
+		*/
 		}
 	});
 

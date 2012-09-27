@@ -651,14 +651,12 @@ function mealListTpl(data){
 
 
 function trimmingListTpl(data){
-	DEBUG_MODE && console.log(data);
 	var tpl = '<div class="square trimming"><div class="innerwrapper">';
 	
 	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p class="label bold">'+data.label+'</p>';
 	
 	for (var i = 0; i < data.meals.length; i++) {
 		var trimming = data.meals[i];
-		DEBUG_MODE && console.log(trimming);
 		tpl += '<h3>'+trimming.name+' </h3>';
 		
 		if (typeof trimming.price !== "undefined" && trimming.price !== "undefined" && trimming.price !== "") {

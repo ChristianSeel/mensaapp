@@ -50,7 +50,7 @@
     	    	pullDownEl =  $wrapper.find('#pullDown')[0];
     	    	//pullDownOffset = pullDownEl.offsetHeight;
     	    	//if (pullDownOffset == 0) pullDownOffset = 0;
-    	    	pullDownOffset = 0;
+    	    	pullDownOffset = 1;
     	    	
     	    	options = {
     	    		useTransition: true,

@@ -64,8 +64,8 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 #tabbar ul li.bigger.current{-webkit-box-shadow:inset 0 1px #ff9ed0,0 0 5px rgba(0,0,0,0.6),inset 0 -8px 21px rgba(0,0,0,0.35);-moz-box-shadow:inset 0 1px #ff9ed0,0 0 5px rgba(0,0,0,0.6),inset 0 -8px 21px rgba(0,0,0,0.35);-o-box-shadow:inset 0 1px #ff9ed0,0 0 5px rgba(0,0,0,0.6),inset 0 -8px 21px rgba(0,0,0,0.35);-ms-box-shadow:inset 0 1px #ff9ed0,0 0 5px rgba(0,0,0,0.6),inset 0 -8px 21px rgba(0,0,0,0.35);box-shadow:inset 0 1px #ff9ed0,0 0 5px rgba(0,0,0,0.6),inset 0 -8px 21px rgba(0,0,0,0.35);}
 #tabbar ul li.bigger.current a{font-weight:normal}
 .scrollwrapper{width:100%;position:absolute;top:0;bottom:49px;z-index:15;overflow:hidden;margin-top:86px}
-.scrollpanel{width:100%;min-height:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;position:relative;padding:0 5px 15px}
-#pullDown{display:none;width:100%;height:30px;position:relative;top:-27px;margin-top:0;margin-bottom:-30px;-webkit-transition-property:margin;-webkit-transition-duration:500ms}
+.scrollpanel{position:relative;width:100%;min-height:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;position:relative;padding:0 5px 15px}
+#pullDown{display:none;width:100%;height:30px;position:relative;top:-27px;margin-top:0;margin-bottom:-30px;-webkit-transition-property:margin-top;-webkit-transition-duration:500ms}
 .scrollrefresh #pullDown{display:block}
 .scrollrefresh .content{margin-top:-20px}
 #pullDown.loading{margin-top:37px}
@@ -92,8 +92,9 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .mensa .org{font-weight:600}
 .mensainfo .innerwrapper{padding-left:20px}
 .mensainfo:after{content:"";display:block;position:absolute;top:0;left:0;height:100%;width:6px;background:#78003c;-webkit-border-top-left-radius:4px;-webkit-border-bottom-left-radius:4px;-moz-border-radius-topleft:4px;-moz-border-radius-bottomleft:4px;border-top-left-radius:4px;border-bottom-left-radius:4px}
+.mealwrapper{position:relative;width:100%;overflow:hidden;margin-top:-10px}
 .meal.showInfo{left:-87%}
-.meal{-webkit-transition-property:left;-webkit-transition-duration:500ms;}
+.meal{-webkit-transition-property:left;-webkit-transition-duration:500ms;left:0;}
 .meal h2,.meal .h2{margin-top:0;padding-right:27px}
 .meal .info{position:absolute;left:100%;width:90%;height:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;text-align:left}
 .meal .label{font-weight:600}
