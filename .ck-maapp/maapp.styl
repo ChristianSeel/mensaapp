@@ -374,7 +374,10 @@ body, #splashscreen
 	z-index: 15
 	overflow: hidden
 	margin-top: 86px
-
+	-webkit-backface-visibility: hidden
+	-webkit-perspective: 1000
+	-webkit-backface-visibility: hidden
+	
 .scrollpanel
 	position: relative
 	width: 100%
@@ -383,6 +386,54 @@ body, #splashscreen
 	position: relative
 	padding: 0 5px 15px
 
+
+.scrollrefresh
+	.content
+		margin-top: -30px
+		
+#pullDown
+	//background: yellow
+	height: 30px
+	//margin-top: -30px
+	position: relative
+	top: -30px
+	-webkit-transition-property:margin-top
+	-webkit-transition-duration:500ms
+
+
+#pullDown.loading
+	margin-top: 40px
+	
+#pullDown .pullDownIcon
+	display:block
+	position: absolute
+	top: 0
+	left: 10px
+	width:30px
+	height:30px
+	background: url(imagePath/pull-icon@2x.png) center center no-repeat
+	background-size: 24px
+	-webkit-transition-property:-webkit-transform
+	-webkit-transition-duration:250ms
+
+#pullDown.flip .pullDownIcon
+	//-webkit-transform:rotate(-90deg)
+	background-image: url(imagePath/pull-icon-flip@2x.png)
+	
+#pullDown.loading .pullDownIcon
+	background-image: url(imagePath/loading2x.gif)
+	background-size: 20px
+
+#pullDown .pullDownLabel
+	display: block
+	padding: 10px 0 0 43px
+	font-weight: 700
+	position: absolute
+	top: 0
+	left: 0
+
+	
+/*
 #pullDown
 	display: none
 	width: 100%
@@ -430,7 +481,7 @@ body, #splashscreen
 	position: absolute
 	top: 0
 	left: 0
-
+*/
 
 /*
  *

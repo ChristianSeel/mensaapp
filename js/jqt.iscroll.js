@@ -53,8 +53,8 @@
     	    	pullDownOffset = 1;
     	    	
     	    	options = {
-    	    		useTransition: true,
-    	    		topOffset: pullDownOffset,
+    	    		//useTransition: true,
+    	    		//topOffset: pullDownOffset,
     	    		
     	    		hScroll: false,
 					hScrollbar: false,
@@ -68,12 +68,12 @@
     	    			}
     	    		},
     	    		onScrollMove: function () {
-    	    			if (this.y > 30 && !pullDownEl.className.match('flip')) {
+    	    			if (this.y > 38 && !pullDownEl.className.match('flip')) {
     	    				
     	    				pullDownEl.className = 'flip';
     	    				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Zum Aktualisieren loslassen';
     	    				this.minScrollY = 0;
-    	    			} else if (this.y < 30 && pullDownEl.className.match('flip')) {
+    	    			} else if (this.y < 38 && pullDownEl.className.match('flip')) {
     	    				pullDownEl.className = '';
     	    				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Zum Aktualisieren herunterziehen';
     	    				this.minScrollY = -pullDownOffset;
