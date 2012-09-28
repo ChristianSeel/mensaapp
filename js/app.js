@@ -79,6 +79,9 @@ var app = {
 		// init database
 		setTimeout(initDB,500);
 		
+		setTimeout(function(){
+			app.onDeviceResume();
+		}, 5000);
 		
 /*		
 		// init facebook connect
@@ -138,9 +141,11 @@ var app = {
 		 
 		DEBUG_MODE && console.log("App resumed");
 		getMensenFromDB(false);
+		cleanDB();
 		 
 	}
 };
+
 
 
 

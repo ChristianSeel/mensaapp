@@ -319,9 +319,15 @@ function listMensenByName(results,mensenliste){
 	mensenliste.find('.locationspinner').remove();
 	var len = results.rows.length;
 	var listed = 0;
+	var last_org = "";
 	for (var i=0; i<len; i++){
 		if (results.rows.item(i).isfavorite == 1) continue;
-		mensenliste.append(mensenListTpl(results.rows.item(i)));
+		var mensa = results.rows.item(i);
+		if (last_org !== mensa.org) {
+			mensenliste.append('<div class="square gray"><h3 class="smallinnerwrapper">'+mensa.org+'</h3></div>');
+		}
+		last_org = mensa.org;
+		mensenliste.append(mensenListTpl( mensa ));
 		listed++;
 		if (i == (len - 1)) {
 			refreshScroll($('#mensen'), true);
@@ -530,6 +536,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				if (mensalen == 1) {
 					var mensa = results.rows.item(0);
 					mensawrapper.html('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck_string+'</span></p></div></div>');
+					
 					if (fetchFromApi === true && mensa.lastcheck < (getTimestamp()-(60*60*24)) && networkState==1) {
 						DEBUG_MODE && console.log("foodplan older than 24h -> get new foodplan from api");
 						$('#busy').fadeIn('fast');
@@ -546,22 +553,24 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				
 				// db request foodplan
 				db.transaction(function(tx) {
-				    tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"', [], function(tx, results) {
+				    tx.executeSql('SELECT * FROM Foodplans WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"' , [], function(tx, results) {
 				    	// success function
 				
 				    	var len = results.rows.length;
-				
+				    	var foodplan = null;
+				    	
 				    	if (len == 1) {
 				    		
-				    		var foodplan = results.rows.item(0);
-
-				    		var trimmings = jQuery.parseJSON( foodplan.trimmings );
-				    		var tlen = trimmings.length;
+				    		foodplan = results.rows.item(0);
 				    		
-				    		for (var j=0; j<tlen; j++){
-				    			speiseplan.append(trimmingListTpl(trimmings[j]));
+				    		if (foodplan.trimmings !== "" && foodplan.trimmings !== "undefined" && foodplan.trimmings !== "null") {
+					    		var trimmings = jQuery.parseJSON( foodplan.trimmings );
+					    		var tlen = trimmings.length;
+					    		
+					    		for (var j=0; j<tlen; j++){
+					    			speiseplan.append(trimmingListTpl(trimmings[j]));
+					    		}
 				    		}
-				    		
 				    	}
 				    	
 				    	
@@ -574,15 +583,15 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 								DEBUG_MODE && console.log(len + " meals found");
 								
 								if (len == 0) {
-									if (fetchFromApi == true && networkState==1) {
+									if (foodplan === null && fetchFromApi === true && networkState == 1) {
 										$('#busy').fadeIn('fast');
 										getMealsFromApi(mensaid, datestamp);
 										return;
 									} else {
-										DEBUG_MODE && console.log("no meals returned by api");
+										DEBUG_MODE && console.log("no meals found");
 										$('#busy').fadeOut();
 										$('#blocker').hide();
-										speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
+										speiseplan.append('<p class="blanktext">Für diesen Tag stehen (noch) keine Speiseplandaten zur Verfügung.</p>');
 										speiseplan.fadeIn('fast');
 										refreshScroll($('#speiseplan'),true);
 									/*	navigator.notification.alert("Für diese Mensa stehen im Moment keine Speiseplandaten zur Verfügung.", // message
@@ -596,11 +605,12 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 								}
 					
 					
-		    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
-						$('#busy').fadeIn('fast');
-						getRecommendationsFromApi(mensaid, datestamp);
-						return;
-					} 
+					    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
+									$('#busy').fadeIn('fast');
+									getMealsFromApi(mensaid, datestamp);
+									//getRecommendationsFromApi(mensaid, datestamp);
+									return;
+								} 
 					
 					
 								for (var i = 0; i < len; i++) {
@@ -764,13 +774,15 @@ function getMealsFromApi(mensaid, datestamp) {
 			// update lastcheck value
 			tx.executeSql('UPDATE Mensen SET lastcheck=?, lastcheck_string=?, lastcheck_recommendations=? WHERE mensaid = ' + mensaid, [results.mensa.lastcheck, results.mensa.lastcheck_string, getTimestamp()]);
 			
+			// remove old meals and inser new ones
+			tx.executeSql('DELETE FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = ' + datestamp);
+			
 			for (var i = 0; i < results.days.length; i++) {
 				var foodplan = results.days[i];
 				// foodplan
 				foodplan.trimmings = JSON.stringify(foodplan.trimmings);
 				tx.executeSql('INSERT OR IGNORE INTO Foodplans (key) VALUES ("' + mensaid + '-' + foodplan.datestamp + '")');
 				tx.executeSql('UPDATE Foodplans SET mensaid=?, datestamp=?, label=?, trimmings=? WHERE key = "' + mensaid + '-' + foodplan.datestamp + '"', [mensaid, foodplan.datestamp, foodplan.label, foodplan.trimmings]);
-				
 				
 				// meals
 				for (var j = 0; j < foodplan.meals.length; j++) {
@@ -799,8 +811,8 @@ function getMealsFromApi(mensaid, datestamp) {
 
 		}, dbError, function() {
 			//success
-			getMenu(mensaid, datestamp, false);
 			DEBUG_MODE && console.log("meals successfull updated");
+			getMenu(mensaid, datestamp, false);
 		});
 
 	}, function(results) {
@@ -837,7 +849,14 @@ function getMealsFromApi(mensaid, datestamp) {
 
 
 
-
+function cleanDB(){
+	DEBUG_MODE && console.log("[DB] Cleaning");
+	nextdatestamp = getDatestamp(AddDays(Datestamp2Date(getDatestamp()),1));
+	db.transaction(function(tx) {
+		tx.executeSql('DELETE FROM Meals WHERE datestamp < ' + nextdatestamp);
+		tx.executeSql('DELETE FROM Foodplans WHERE datestamp < ' + nextdatestamp);
+	});
+}
 
 
 
