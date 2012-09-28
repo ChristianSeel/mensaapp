@@ -302,6 +302,9 @@ body, #splashscreen
 			float: left
 			width: 34.5%
 			height: 100%
+			z-index: 2010
+			-webkit-transition-property:box-shadow
+			-webkit-transition-duration:150ms
 			a
 				display: block
 				width: 100%
@@ -336,6 +339,7 @@ body, #splashscreen
 			position: absolute
 			right: 0
 		li.bigger
+			z-index: 2020
 			position: absolute
 			top: -6px
 			left: 33.33%
@@ -344,7 +348,7 @@ body, #splashscreen
 			height: 58px
 			background: linear-gradient(top, #99004d, #620032)
 			border: 1px solid #70013a
-			box-shadow: inset 0 1px #FF9ED0,0 0 5px rgba(0, 0, 0, 0.6), inset 0px -8px 21px rgba(0, 0, 0, 0.1)
+			box-shadow: inset 0 1px #FF9ED0,0 0 5px rgba(0, 0, 0, 0.6), inset 0px -8px 21px rgba(0, 0, 0, 0.25)
 			box-sizing: border-box
 			a
 				padding-top: 36px
@@ -355,8 +359,8 @@ body, #splashscreen
 			a
 				font-weight: 700
 		li.bigger.current
-			//box-shadow: inset 0 1px #FF9ED0,0 0 5px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.4)
-			box-shadow: inset 0 1px #FF9ED0,0 0 5px rgba(0, 0, 0, 0.6), inset 0px -8px 21px rgba(0, 0, 0, 0.35)
+			box-shadow: inset 0 1px #FF9ED0,0 0 5px rgba(0, 0, 0, 0.6), inset 0px -8px 15px rgba(0, 0, 0, 0.2), inset 0 0 25px rgba(255,255,255,0.3)
+			//box-shadow: inset 0 1px #FF9ED0,0 0 5px rgba(0, 0, 0, 0.6), inset 0px -8px 21px rgba(0, 0, 0, 0.1)
 			a
 				font-weight: normal
 			

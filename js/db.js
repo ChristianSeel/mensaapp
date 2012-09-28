@@ -318,14 +318,17 @@ function listMensenByName(results,mensenliste){
 	$('#mensen .navigationbar h1').text("Mensa auswählen");
 	mensenliste.find('.locationspinner').remove();
 	var len = results.rows.length;
+	var listed = 0;
 	for (var i=0; i<len; i++){
 		if (results.rows.item(i).isfavorite == 1) continue;
 		mensenliste.append(mensenListTpl(results.rows.item(i)));
+		listed++;
 		if (i == (len - 1)) {
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
 			$('#blocker').hide();
 			hideSplashscreen();
+			DEBUG_MODE && console.log("Listed "+listed+" Mensen.");
 		}
 	}
 }
@@ -335,7 +338,7 @@ function listMensenByDistance(results,mensenliste,location){
 	$('#mensen .navigationbar h1').text("Mensen in deiner Nähe");
 	if (location.geoip == "true") mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
 	mensenliste.find('.locationspinner').remove();
-	
+	var listed = 0;
 	// sort by distance
 	var mensen = new Array();
 	
@@ -363,9 +366,11 @@ function listMensenByDistance(results,mensenliste,location){
 			$('#busy').fadeOut();
 			$('#blocker').hide();
 			hideSplashscreen(); // hide dom splashscreen on init
+			DEBUG_MODE && console.log("Listed "+listed+" Mensen.");
 			return;
 		}
 		mensenliste.append(mensenListTpl(mensen[i]));
+		listed++;
     }
 }
 
@@ -533,7 +538,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 					}
 					
 					var lastcheck_recommendations = mensa.lastcheck_recommendations;
-		    		console.log("last check for recommendations on "+lastcheck_recommendations);
+		    		DEBUG_MODE && console.log("last check for recommendations on "+lastcheck_recommendations);
 					
 				}
 				
@@ -576,6 +581,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 									} else {
 										DEBUG_MODE && console.log("no meals returned by api");
 										$('#busy').fadeOut();
+										$('#blocker').hide();
 										speiseplan.append('<p class="blanktext">Für diesen Tag stehen noch keine Speiseplandaten zur Verfügung.</p>');
 										speiseplan.fadeIn('fast');
 										refreshScroll($('#speiseplan'),true);
@@ -606,7 +612,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										speiseplan.fadeIn(150);
 					    				refreshScroll($('#speiseplan'),true);
 					    				$('#busy').fadeOut();
-										
+										$('#blocker').hide();
 									}
 								}
 					
@@ -713,7 +719,6 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 			//success
 			DEBUG_MODE && console.log("recommendations successfull updated");
 			getMenu(mensaid, datestamp, false);
-			$('#blocker').hide();
 		});
 
 	}, function(results) {
@@ -795,7 +800,6 @@ function getMealsFromApi(mensaid, datestamp) {
 		}, dbError, function() {
 			//success
 			getMenu(mensaid, datestamp, false);
-			$('#blocker').hide();
 			DEBUG_MODE && console.log("meals successfull updated");
 		});
 
@@ -846,27 +850,25 @@ function getMealsFromApi(mensaid, datestamp) {
 
 
 function pullDownAction (scroll,$wrapper) {
-			
+
+			$('#blocker').show(); //block UI during request
 			switch ($wrapper.parent().attr('id')) {
 			
 			case "speiseplan":
 				getMealsFromApi($('#speiseplan').data('mensaid'), $('#speiseplan').data('datestamp'));
-				$('#blocker').show(); //block UI during request
 				break;
 			
 			
 			case "mensen":
 				getMensenFromApi();
-				$('#blocker').show(); //block UI during request
 				break;
 			
 			
-			default: 
+			default:
 				setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
-						
 					alert('yeah! 42!');
-						
-					scroll.refresh();		// Remember to refresh when contents are loaded (ie: on ajax completion)
+				//	scroll.refresh();		// Remember to refresh when contents are loaded (ie: on ajax completion)
+					$('#blocker').hide(); //block UI during request
 				}, 1500);	// <-- Simulate network congestion, remove setTimeout from production!
 				break;
 			}
