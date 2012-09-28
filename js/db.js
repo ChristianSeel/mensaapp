@@ -366,7 +366,7 @@ function listMensenByDistance(results,mensenliste,location){
 	});
 	var mlen = mensen.length;
 	for (var i=0; i<mlen; i++){
-		if (i > 50 || (mensen[i]['distance'] > 100 && i > 25) || i == (mlen - 1)) {
+		if (i > 50 || (mensen[i]['distance'] > 100 && i > 20) || i == (mlen - 1)) {
 			mensenliste.append('<div class="square linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
@@ -563,7 +563,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				    		
 				    		foodplan = results.rows.item(0);
 				    		
-				    		if (foodplan.trimmings !== "" && foodplan.trimmings !== "undefined" && foodplan.trimmings !== "null") {
+				    		if (foodplan.trimmings != null && foodplan.trimmings != "undefined" && typeof foodplan.trimmings != "undefined") {
 					    		var trimmings = jQuery.parseJSON( foodplan.trimmings );
 					    		var tlen = trimmings.length;
 					    		
@@ -571,6 +571,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 					    			speiseplan.append(trimmingListTpl(trimmings[j]));
 					    		}
 				    		}
+				    	
 				    	}
 				    	
 				    	
