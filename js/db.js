@@ -780,11 +780,12 @@ function getMealsFromApi(mensaid, datestamp) {
 			
 			for (var i = 0; i < results.days.length; i++) {
 				var foodplan = results.days[i];
+				
 				// foodplan
 				foodplan.trimmings = JSON.stringify(foodplan.trimmings);
 				tx.executeSql('INSERT OR IGNORE INTO Foodplans (key) VALUES ("' + mensaid + '-' + foodplan.datestamp + '")');
 				tx.executeSql('UPDATE Foodplans SET mensaid=?, datestamp=?, label=?, trimmings=? WHERE key = "' + mensaid + '-' + foodplan.datestamp + '"', [mensaid, foodplan.datestamp, foodplan.label, foodplan.trimmings]);
-				
+	
 				// meals
 				for (var j = 0; j < foodplan.meals.length; j++) {
 					var meal = foodplan.meals[j];
@@ -852,11 +853,15 @@ function getMealsFromApi(mensaid, datestamp) {
 
 function cleanDB(){
 	DEBUG_MODE && console.log("[DB] Cleaning");
-	nextdatestamp = getDatestamp(AddDays(Datestamp2Date(getDatestamp()),1));
+	//nextdatestamp = getDatestamp(AddDays(Datestamp2Date(getDatestamp()),7));
+	nextdatestamp = getDatestamp();
+	console.log("[DB] Cleaning Meals older than "+nextdatestamp);
+	
 	db.transaction(function(tx) {
-		tx.executeSql('DELETE FROM Meals WHERE datestamp < ' + nextdatestamp);
-		tx.executeSql('DELETE FROM Foodplans WHERE datestamp < ' + nextdatestamp);
+		tx.executeSql('DELETE FROM Meals WHERE datestamp < "' + nextdatestamp + '"');
+		tx.executeSql('DELETE FROM Foodplans WHERE datestamp < ' + nextdatestamp + '"');
 	});
+	
 }
 
 
