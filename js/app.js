@@ -200,13 +200,8 @@ $(function(){
 	
 	
 	
-	// Orientation callback event
-/*	$('#jqt').bind('turn', function(e, data){
-		DEBUG_MODE && console.log("Orientation changed.");
-	});
-*/	
 	
-	
+	// block navigation and track pageview
 	$('#jqt > div').live('pageAnimationStart', function(e, data){
 		if (data.direction == "in") {
 			$('#tabbar li').removeClass("current");
@@ -217,9 +212,7 @@ $(function(){
 		}
 		
 	});
-	
-	
-	
+
 	$('#jqt > div').live('pageAnimationEnd', function(e, data){
 		if (data.direction == "out") {
 			disableNavigation = false;
@@ -227,6 +220,24 @@ $(function(){
 	});
 	
 	
+	
+	// Orientation callback event
+/*	$('#jqt').bind('turn', function(e, data){
+		DEBUG_MODE && console.log("Orientation changed.");
+	});
+*/	
+
+	// scroll to top
+	$('.navigationbar h1, .current').live("click",function(e) {
+		e.preventDefault();
+		console.log("scrollToTop triggered!");
+		var scroll = $('#jqt > .current .scrollwrapper').data(KEY_ISCROLL_OBJ);
+		scroll.scrollTo(0,0,350);
+	});
+
+
+
+
 	
 	$('#fblogin').live("click",function(e) {
 		e.preventDefault();
@@ -246,6 +257,13 @@ $(function(){
 	});
 	
 	
+	
+	
+	/*
+	 *
+	 * Mensa
+	 *
+	 */
 	
 	$('.mensa').live("click",function(e){
 		e.preventDefault();
@@ -274,6 +292,8 @@ $(function(){
 		}
 		return false;
 	});
+	
+	
 	
 	
 	
@@ -361,9 +381,7 @@ $(function(){
 	});
 
 
-
-
-
+	
 
 
 
