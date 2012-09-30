@@ -716,15 +716,19 @@ function getDatestamp(time){
 	} else {
 		d = time;
 	}
-	return (d.getFullYear()+"") + (pad(d.getMonth()+1,2)+"") + (pad(d.getDate(),2)+"");
+	return (d.getFullYear()+"") + "-" + (pad(d.getMonth()+1,2)+"") + "-" + (pad(d.getDate(),2)+"");
 }
 
 function Datestamp2Date(datestamp){
+/*
 	year = datestamp.substring(0,4);
-	month = datestamp.substring(4,6);
+	month = datestamp.substring(5,7);
 	month = month - 1;
-	day = datestamp.substring(6,8);
-	return new Date(year, month, day);
+	day = datestamp.substring(7,9);
+*/
+	parts = datestamp.split("-");
+	month = parts[1] - 1;
+	return new Date(parts[0], month, parts[2]);
 }
 
 function Datestamp2String(datestamp){
