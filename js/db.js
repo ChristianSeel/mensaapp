@@ -607,10 +607,10 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 					
 					
 					    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
-									$('#busy').fadeIn('fast');
-									getMealsFromApi(mensaid, datestamp);
-									//getRecommendationsFromApi(mensaid, datestamp);
-									return;
+									//$('#busy').fadeIn('fast');
+									//getMealsFromApi(mensaid, datestamp);
+									getRecommendationsFromApi(mensaid, datestamp);
+									//return;
 								} 
 					
 					
@@ -666,7 +666,7 @@ function mealListTpl(data){
 	
 	tpl = tpl.substr(0, tpl.length -4);
 	
-	tpl += '</p></div><p class="recommendations">'+data.recommendations+' Personen empfehlen dieses Gericht.</p></div>';
+	tpl += '</p></div><p class="recommendations"><span class="value">'+data.recommendations+'</span> Personen empfehlen dieses Gericht.</p></div>';
 	
 	return tpl;
 }
@@ -700,7 +700,7 @@ function trimmingListTpl(data){
 }
 
 
-
+/*
 function getRecommendationsFromApi(mensaid, datestamp) {
 
 	DEBUG_MODE && console.log("fetching recommendations of mensa " + mensaid + " from api");
@@ -759,6 +759,73 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 
 	});
 }
+*/
+
+
+function getRecommendationsFromApi(mensaid, datestamp) {
+
+	DEBUG_MODE && console.log("fetching recommendations and meals of mensa " + mensaid + " from api");
+	
+	api('getmeals?mensaid=' + mensaid, function(results) {
+		//success
+		var days = results.days.length;
+
+		db.transaction(function(tx) {
+			
+			// update lastcheck value
+			tx.executeSql('UPDATE Mensen SET lastcheck=?, lastcheck_string=?, lastcheck_recommendations=? WHERE mensaid = ' + mensaid, [results.mensa.lastcheck, results.mensa.lastcheck_string, getTimestamp()]);
+			
+			// remove old meals and inser new ones
+			tx.executeSql('DELETE FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"');
+			
+			for (var i = 0; i < results.days.length; i++) {
+				var foodplan = results.days[i];
+				
+				// foodplan
+				foodplan.trimmings = JSON.stringify(foodplan.trimmings);
+				tx.executeSql('INSERT OR IGNORE INTO Foodplans (key) VALUES ("' + mensaid + '-' + foodplan.datestamp + '")');
+				tx.executeSql('UPDATE Foodplans SET mensaid=?, datestamp=?, trimmings=? WHERE key = "' + mensaid + '-' + foodplan.datestamp + '"', [mensaid, foodplan.datestamp, foodplan.trimmings]);
+	
+				// meals
+				for (var j = 0; j < foodplan.meals.length; j++) {
+					var meal = foodplan.meals[j];
+					
+					if ( typeof meal.label == "undefined")
+						meal.label = "";
+						
+					if ( typeof meal.info == "undefined")
+						meal.info = "";
+					
+					if ( typeof meal.name == "undefined")
+						meal.name = "";
+					
+					meal.price = JSON.stringify(meal.price);
+						
+					if ( typeof meal.recommendations == "undefined") {
+						meal.recommendations = 0;
+					}
+					if (DEBUG_MODE)  meal.recommendations = Math.round(Math.random() * (100 - 1));
+
+					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
+					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
+					
+					$('[data-mealid="'+meal.mealid+'"] .recommendations .value').text(meal.recommendations);
+				}
+			}
+
+		}, dbError, function() {
+			//success
+			DEBUG_MODE && console.log("recommendations and meals successfull updated");
+		});
+
+	}, function(results) {
+		//fail
+		DEBUG_MODE && console.log("recommendations and meals update failed");
+		DEBUG_MODE && console.log(results);
+	});
+
+}
+
 
 
 
