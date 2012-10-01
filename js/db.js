@@ -801,7 +801,7 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 					if ( typeof meal.recommendations == "undefined") {
 						meal.recommendations = 0;
 					}
-					if (DEBUG_MODE)  meal.recommendations = Math.round(Math.random() * (100 - 1));
+					//if (DEBUG_MODE)  meal.recommendations = Math.round(Math.random() * (100 - 1));
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
 					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);

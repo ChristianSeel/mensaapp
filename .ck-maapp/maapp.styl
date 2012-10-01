@@ -645,9 +645,6 @@ body, #splashscreen
 		text-align: left
 	.label
 		font-weight: 600
-	.recommendations
-		padding: 4px 15px
-		background: #ddd
 	.infoIcon
 		display: block
 		position: absolute
@@ -657,6 +654,21 @@ body, #splashscreen
 		height: 43px
 		background: transparent url(imagePath/infoIcon-dark@2x.png) center center no-repeat
 		background-size: 20px
+	.recommendations
+		position: relative
+		bottom: -1px
+		padding: 4px 35px 4px 15px
+		background: #ddd
+	.recommendations:after
+		content:""
+		display:block
+		position: absolute
+		top: 0
+		right: 0
+		width: 40px
+		height: 24px
+		background: transparent url(imagePath/icon-recommend@2x.png) center center no-repeat
+		background-size: 12px
 
 .trimming
 	h3

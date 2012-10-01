@@ -367,12 +367,38 @@ $(function(){
 		}
 	});
 	
+	
 	// recommend
 	$('.meal .recommendations').live("click",function(e){
 		e.preventDefault();
-		var mealid = $(this).parent('.meal').data('mealid');
-		postrecommendation(mealid);
+	
+		if (!fbuser) {
+			navigator.notification.confirm(
+				'Um ein Gericht empfehlen zu können musst du dich zuerst mit Hilfe von Facebook einloggen.',  // message
+				function(index){
+					if (index==1) fbLogin();
+				},              // callback to invoke with index of button pressed
+				"Login erforderlich",            // title
+				'Einloggen,Abbrechen'          // buttonLabels
+			);
+			return false;
+		}	
+		
+		var mealwrapper = $(this).parent('.meal');
+		var mealid = mealwrapper.data('mealid');
+		var mealname = $('h2',mealwrapper).text();
+		navigator.notification.confirm(
+			'Möchtest du '+ mealname +' empfehlen?',  // message
+			function(index){
+				if (index==1) postrecommendation(mealid);
+			},              // callback to invoke with index of button pressed
+			"Empfehlung veröffentlichen",            // title
+			'Empfehlen,Abbrechen'          // buttonLabels
+		);
+		return false;
+		
 	});
+	
 
 	// show infos
 	$('.meal .infoIcon').live("click",function(e){
@@ -414,12 +440,14 @@ function removeMensaFromFavorite(mensaid) {
 function postrecommendation(mealid,cb){
 	
 	if (cb == null) cb = function(){};
-	
-	var url = 'http://mensaapp.de/meal/'+mealid+'/';
+	$('#busy').fadeIn();
+	var url = 'http://mensaapp.de/recommendation/'+mealid+'/';
 	FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', { access_token: fbaccessToken, meal: url}, function(response) {
 		DEBUG_MODE && console.log(response);
+		
 		if (!response || response.error) {
 			cb();
+			$('#busy').fadeOut();
 			if (response.error.code == 3501) {
 				// og action was already performed
 				return;
@@ -430,10 +458,15 @@ function postrecommendation(mealid,cb){
 				"Fehler",            // title
 				'OK'                  // buttonName
 			);
-		} else {
-			DEBUG_MODE && console.log('Post ID: ' + response.id);
-			cb();
 			
+		} else {
+			DEBUG_MODE && console.log('Recommendation post ID: ' + response.id);
+			api('/pushrecommendation?mealid='+mealid, function(response){
+				DEBUG_MODE && console.log("successfull pushed recommendation");
+				$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
+				cb();
+				$('#busy').fadeOut();
+			});
 		}
 	});
 	
@@ -555,6 +588,9 @@ function hideSplashscreen() {
  */
 function api(url, success, fail) {
 	
+	if (success == null) success = function(){};
+	if (fail == null) fail = function(){};
+	
 	if (networkState==0){ // if no network return error
 		response = {error:{error_key:"networkState",title:"Fehler",description:"Du hast keine Verbindung zum Internet!"}};
 		fail(response);
@@ -564,7 +600,7 @@ function api(url, success, fail) {
 	DEBUG_MODE && console.log("api request: "+url);
 	
 	if (url.indexOf("?") == -1) url += "?";
-	url += "&ma_hash="+hash.gen("enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion);
+	url += "&ma_hash="+hash.gen("enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion+"&fbuid="+fbuser.id);
 		
 	
 	$.getJSONP({
