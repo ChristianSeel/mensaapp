@@ -648,22 +648,22 @@ function mealListTpl(data){
 	tpl += '<div class="innerwrapper">';
 	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
 	
-	tpl += '<h2>'+data.name+' </h2><p>';
+	tpl += '<h2>'+data.name+' </h2>';
 	
 	
 	if (typeof data.price !== "undefined" && data.price !== "undefined" && data.price !== "") {
 		var price = jQuery.parseJSON( data.price );
-		tpl += '<span class="price">';
+		tpl += '<p><span class="price">';
 			for (p in price) {
 				tpl += p + ': '+ price[p] + ' | ';
 			}
 			tpl = tpl.substr(0, tpl.length -3);
-		tpl +='</span><br>';
+		tpl +='</span></p>';
 	}
 	
-	tpl = tpl.substr(0, tpl.length -4);
+	//tpl = tpl.substr(0, tpl.length -4);
 	
-	tpl += '</p></div><p class="recommendations"><span class="value">'+data.recommendations+'</span> Personen empfehlen dieses Gericht.</p></div>';
+	tpl += '</div><p class="recommendations"><span class="value">'+data.recommendations+'</span> Personen empfehlen dieses Gericht.</p></div>';
 	
 	return tpl;
 }
@@ -863,7 +863,11 @@ function getMealsFromApi(mensaid, datestamp) {
 					if ( typeof meal.name == "undefined")
 						meal.name = "";
 					
-					meal.price = JSON.stringify(meal.price);
+					if ( typeof meal.price == "undefined") {
+						meal.price = "";
+					} else {
+						meal.price = JSON.stringify(meal.price);
+					}
 						
 					if ( typeof meal.recommendations == "undefined") {
 						meal.recommendations = 0;
