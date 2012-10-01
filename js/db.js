@@ -607,10 +607,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 					
 					
 					    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
-									//$('#busy').fadeIn('fast');
-									//getMealsFromApi(mensaid, datestamp);
 									getRecommendationsFromApi(mensaid, datestamp);
-									//return;
 								} 
 					
 					

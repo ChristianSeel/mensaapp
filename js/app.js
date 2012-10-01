@@ -228,7 +228,7 @@ $(function(){
 */	
 
 	// scroll to top
-	$('.navigationbar h1, .current').live("click",function(e) {
+	$('.navigationbar h1, #header .wrapper, #header h1').live("click",function(e) {
 		e.preventDefault();
 		console.log("scrollToTop triggered!");
 		var scroll = $('#jqt > .current .scrollwrapper').data(KEY_ISCROLL_OBJ);
