@@ -79,7 +79,7 @@ var app = {
 		// init database
 		setTimeout(initDB,500);
 				
-/*		
+	
 		// init facebook connect
 		try {
 			FB.init({
@@ -130,12 +130,22 @@ var app = {
 				DEBUG_MODE && console.log("[Facebook] User is NOT logged in.");
 			}
 		});
-*/
+
 	},
 	
 	onDeviceResume: function() {
 		 
 		DEBUG_MODE && console.log("App resumed");
+		
+		networkConnection = navigator.network.connection.type;
+		if (networkConnection == Connection.UNKNOWN || networkConnection == Connection.NONE) {
+			networkState = 0;
+			DEBUG_MODE && console.log("Network state: "+networkState);
+		} else {
+			networkState = 1;
+			DEBUG_MODE && console.log("Network state: "+networkState);
+		}
+		
 		getMensenFromDB(false);
 		cleanDB();
 		 
@@ -380,59 +390,9 @@ $(function(){
 		}
 	});
 
-
-	
-
-
-
-
-	// refesh Icon
-	$('#events .refreshIcon').live("click",function(e) {
-	    e.preventDefault();
-	    if ($(this).hasClass('rotate')) {
-	    	// do nothing
-	    } else {
-	    	$('#busy').fadeIn();
-	    	$(this).addClass('rotate');
-	    	getEventsFromApi(function(){
-	    		$('#events .refreshIcon').removeClass('rotate');
-	    		$('#busy').fadeOut();
-	    	});
-	    	
-	    }
-	});
-	
-	
-/*	
-	// event fb actions
-	$('#jqt > div[data-iseventpage] a[data-fbaction]').live("click",function(e) {
-	    e.preventDefault();
-	    switch($(this).data('fbaction')){
-		    case "rsvp_event":
-		    	doRSVP($(this).data('eventfbid'));
-		    	break;
-		    case "event_invite":
-		    	getEventInvites($(this).data('eventfbid'));
-		    	break;
-		    case "share":
-		    	doShare($(this).data('sharelink'));
-		    	break;
-	    }
-	});
-	
-*/	
-	
-/*	
-	$('#jqt > #mensen').bind('pageAnimationStart', function(e, info){ 
-		if ($(this).data('loaded') == false && info.direction == "in") {
-			getMensen();
-		}
-	});
-*/	
-
-	
-
 }); // end of jQuery code
+
+
 
 
 function addMensaToFavorite(mensaid) {
@@ -494,7 +454,6 @@ function fbLogout(){
 	
 	$('#busy').fadeIn();
 	$('#konto .scrollpanel .online').fadeOut();
-	$('#konto .refreshIcon').fadeOut();
 
 	FB.logout(function(response) {
 		DEBUG_MODE && console.log("[Facebook] Logout function");
@@ -504,11 +463,6 @@ function fbLogout(){
 		});
 		
 		$('#konto .scrollpanel .online').html("");
-		$('[data-clearOnLogout="true"]').html("");
-		$('[data-deleteOnLogout="true"]').remove("");
-		
-		$('#pointlog').data("loaded",false);
-		$('#couponlog').data("loaded",false);
 	});
 }
 
@@ -519,37 +473,17 @@ function onLogin(){
 	DEBUG_MODE && console.log("Hallo " + fbuser.full_name);
 	
 	$('#konto .scrollpanel .offline').hide();
-	
 	$('#konto .scrollpanel .online').html(getKontoTpl()).fadeIn();
-	$('#konto .refreshIcon').fadeIn();
 	
 }
 
 
-/*
-function getKontoTpl(){
-	var pluralE = "e";
-	if (fbuser.numberofcoupons == 1) pluralE = "";
-	var tpl = '<div class="span nopadding">
-	<div id="kontooverview">
-		<img class="backgroundimage" src="'+fbuser.picture+'"/>
-		<div class="content">
-			<div class="line"></div>
-			<h2>Hi '+fbuser.first_name+'!</h2>
-			<a id="totalpoints" href="#pointlog"><span>'+fbuser.totalpoints+'</span> Punkte</a>
-			<a id="couponcount" href="#couponlog"><span>'+fbuser.numberofcoupons+'</span> Gutschein'+pluralE+'</a>
-			<div class="userimg" style="background-image: url('+fbuser.picture+');"></div>
-		</div>
-	</div>
-</div>
 
-<a href="#couponlog" class="bold graybutton icon icon-coupon">Gutscheine</a>
-<a href="#pointlog" class="bold graybutton icon icon-pointlog">Punkte-Historie</a>
-<a id="playKontoVideo" href="#" class="bold graybutton icon icon-help">Hilfe-Video</a>
-<a href="#" id="fblogout" class="bold bluebutton icon">Abmelden</a>';
-return tpl
+function getKontoTpl(){
+	var tpl = '<div class="square innerwrapper"><h3>Du bist angemeldet als:</h3><p class="bold">'+fbuser.name+'<br>'+fbuser.email+'</p></div><a id="fblogout" class="bold square blue innerwrapper icon">Abmelden</a>';
+	return tpl;
 }
-*/
+
 
 
 
