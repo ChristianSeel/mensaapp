@@ -95,16 +95,21 @@ var app = {
 		
 		// fb auth.login
 		FB.Event.subscribe('auth.login', function(result) {
-			
 			$('#busy').fadeIn();
-			
 			DEBUG_MODE && console.log("[Facebook] auth.login event");
-
+			fbaccesstoken = result.authResponse.accessToken;
 			
+			FB.api('/me', function(meresponse) {
+				fbuser = meresponse;
+				DEBUG_MODE && console.log("Say hi to " + fbuser.name);
+				$('#konto .scrollpanel .offline').hide();
+				var kontotpl = '<div class="square innerwrapper"><h3>Du bist angemeldet als:</h3><p class="bold">'+fbuser.name+'<br>'+fbuser.email+'</p></div><a id="fblogout" class="bold square blue innerwrapper icon">Abmelden</a>';
+				$('#konto .scrollpanel .online').html(kontotpl).fadeIn();
+				$('#busy').fadeOut();
+			});
+
 			// pass checkpoint
 			!DEBUG_MODE && googleAnalytics.trackEvent("Account", "Login");
-			
-			
 		});
 		
 		
@@ -117,7 +122,6 @@ var app = {
 				fbaccessToken = "";
 				
 				!DEBUG_MODE && googleAnalytics.trackEvent("Account", "Logout");
-				
 			}
 		});
 		
@@ -363,31 +367,27 @@ $(function(){
 		}
 	});
 	
-
-	$('.meal.showInfo').live("click",function(e){
+	// recommend
+	$('.meal .recommendations').live("click",function(e){
 		e.preventDefault();
-		$(this).removeClass('showInfo');
-	/*	$(this).animate({
-			left: '0',
-		}, 300);
-	*/
+		var mealid = $(this).parent('.meal').data('mealid');
+		postrecommendation(mealid);
 	});
-	
+
+	// show infos
 	$('.meal .infoIcon').live("click",function(e){
 		e.preventDefault();
 		var parent = $(this).parent('.square');
 		if (!parent.hasClass('showInfo') === true) {
 			$(this).parent('.square').siblings().removeClass('showInfo');
-		/*	$(this).parent('.square').siblings().animate({
-				left: '0',
-			}, 300);
-		*/
 			parent.addClass('showInfo');
-		/*	parent.animate({
-				left: '-87%',
-			}, 500);
-		*/
 		}
+	});
+	
+	// hide infos
+	$('.meal.showInfo').live("click",function(e){
+		e.preventDefault();
+		$(this).removeClass('showInfo');
 	});
 
 }); // end of jQuery code
@@ -411,16 +411,17 @@ function removeMensaFromFavorite(mensaid) {
 
 
 
-function doLike(url,cb){
+function postrecommendation(mealid,cb){
 	
 	if (cb == null) cb = function(){};
-		
-	FB.api('/'+fbuser.id+'/og.likes', 'post', { access_token: fbaccessToken, object: url}, function(response) {
+	
+	var url = 'http://mensaapp.de/meal/'+mealid+'/';
+	FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', { access_token: fbaccessToken, meal: url}, function(response) {
 		DEBUG_MODE && console.log(response);
 		if (!response || response.error) {
 			cb();
 			if (response.error.code == 3501) {
-				$(".ps-toolbar-like .ps-toolbar-content").addClass("active").delay(1000).removeClass("active");
+				// og action was already performed
 				return;
 			}
 			navigator.notification.alert(
@@ -432,7 +433,7 @@ function doLike(url,cb){
 		} else {
 			DEBUG_MODE && console.log('Post ID: ' + response.id);
 			cb();
-			$(".ps-toolbar-like .ps-toolbar-content").addClass("active").delay(1000).removeClass("active");
+			
 		}
 	});
 	
@@ -466,23 +467,6 @@ function fbLogout(){
 	});
 }
 
-
-function onLogin(){
-	
-	DEBUG_MODE && console.log("function onLogin fired");
-	DEBUG_MODE && console.log("Hallo " + fbuser.full_name);
-	
-	$('#konto .scrollpanel .offline').hide();
-	$('#konto .scrollpanel .online').html(getKontoTpl()).fadeIn();
-	
-}
-
-
-
-function getKontoTpl(){
-	var tpl = '<div class="square innerwrapper"><h3>Du bist angemeldet als:</h3><p class="bold">'+fbuser.name+'<br>'+fbuser.email+'</p></div><a id="fblogout" class="bold square blue innerwrapper icon">Abmelden</a>';
-	return tpl;
-}
 
 
 
