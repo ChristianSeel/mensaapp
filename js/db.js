@@ -181,7 +181,7 @@ function getMensenFromApi() {
 					var mensa = results.mensen[i];
 					
 					tx.executeSql('INSERT OR IGNORE INTO Mensen (mensaid) VALUES ('+mensa.mensaid+')');
-					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, city=?, lastcheck=?, lastcheck_string=?, lastcheck_recommendations=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.city, mensa.lastcheck, mensa.lastcheck_string, 0, mensa.coord.lon, mensa.coord.lat]);
+					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, postal=?, city=?, address=?, lastcheck=?, lastcheck_string=?, lastcheck_recommendations=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.postal, mensa.city, mensa.address, mensa.lastcheck, mensa.lastcheck_string, 0, mensa.coord.lon, mensa.coord.lat]);
 					
 					tx.executeSql('INSERT OR IGNORE INTO FavoriteMensen (mensaid,isfavorite) VALUES ('+mensa.mensaid+',0)');
 				}
@@ -923,7 +923,7 @@ function cleanDB(){
 	
 	db.transaction(function(tx) {
 		tx.executeSql('DELETE FROM Meals WHERE datestamp < "' + nextdatestamp + '"');
-		tx.executeSql('DELETE FROM Foodplans WHERE datestamp < ' + nextdatestamp + '"');
+		tx.executeSql('DELETE FROM Foodplans WHERE datestamp < "' + nextdatestamp + '"');
 	});
 	
 }
@@ -954,11 +954,12 @@ function pullDownAction (scroll,$wrapper) {
 			
 			
 			default:
-				setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
+			/*	setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
 					alert('yeah! 42!');
 				//	scroll.refresh();		// Remember to refresh when contents are loaded (ie: on ajax completion)
 					$('#blocker').hide(); //block UI during request
 				}, 1500);	// <-- Simulate network congestion, remove setTimeout from production!
+			*/
 				break;
 			}
 				
