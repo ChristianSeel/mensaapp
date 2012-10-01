@@ -664,7 +664,7 @@ function mealListTpl(data){
 	//tpl = tpl.substr(0, tpl.length -4);
 	
 	tpl += '</div><p class="recommendations"><span class="value">'+data.recommendations+'</span> Personen empfehlen dieses Gericht.</p></div>';
-	
+
 	return tpl;
 }
 
@@ -903,7 +903,10 @@ function getMealsFromApi(mensaid, datestamp) {
 			var msg = "Es ist ein unbekannter Fehler aufgetreten.";
 		}
 		
-		if (results.error.key == "no_meals") $('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>').fadeIn(150);
+		if (results.error.key == "no_meals") {
+			$('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>').fadeIn(150);
+			return;
+		}
 
 		navigator.notification.alert(msg, // message
 		alertDismissed, // callback
