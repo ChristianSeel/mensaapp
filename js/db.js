@@ -714,68 +714,6 @@ function trimmingListTpl(data){
 }
 
 
-/*
-function getRecommendationsFromApi(mensaid, datestamp) {
-
-	DEBUG_MODE && console.log("fetching recommendations of mensa " + mensaid + " from api");
-	
-	api('getrecommendations?mensaid=' + mensaid, function(results) {
-		//success
-
-		db.transaction(function(tx) {
-			
-			// update lastcheck value
-			tx.executeSql('UPDATE Mensen SET lastcheck_recommendations=? WHERE mensaid = ' + mensaid, [getTimestamp()]);
-			
-			for (var i = 0; i < results.meals.length; i++) {
-				var meal = results.meals[i];
-				
-				// debug: add random recommendations
-				if (DEBUG_MODE && meal.recommendations == 0) meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
-				
-				// insert recommendations
-				tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
-				tx.executeSql('UPDATE Meals SET recommendations=? WHERE mealid = ' + meal.mealid, [meal.recommendations]);
-				
-				
-			}
-
-		}, dbError, function() {
-			//success
-			DEBUG_MODE && console.log("recommendations successfull updated");
-			getMenu(mensaid, datestamp, false);
-		});
-
-	}, function(results) {
-		//fail
-		DEBUG_MODE && console.log("recommendations update failed");
-		DEBUG_MODE && console.log(results);
-		
-		// continue with display menu, even if recommendations couldn't be loaded
-		getMenu(mensaid, datestamp, false);
-		
-		if (results.error.title) {
-			var title = results.error.title + "";
-		} else {
-			var title = "Fehler";
-		}
-		if (results.error.description) {
-			var msg = results.error.description + "";
-		} else {
-			var msg = "Es ist ein unbekannter Fehler aufgetreten.";
-		}
-
-		navigator.notification.alert(msg, // message
-		alertDismissed, // callback
-		title, // title
-		'OK' // buttonName
-		);
-
-	});
-}
-*/
-
-
 function getRecommendationsFromApi(mensaid, datestamp) {
 
 	DEBUG_MODE && console.log("fetching recommendations and meals of mensa " + mensaid + " from api");
@@ -813,11 +751,15 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 					if ( typeof meal.name == "undefined")
 						meal.name = "";
 					
-					meal.price = JSON.stringify(meal.price);
-						
-					if ( typeof meal.recommendations == "undefined") {
-						meal.recommendations = 0;
+					if ( typeof meal.price == "undefined") {
+						meal.price = "";
+					} else {
+						meal.price = JSON.stringify(meal.price);
 					}
+						
+					if ( typeof meal.recommendations == "undefined")
+						meal.recommendations = 0;
+					
 					//if (DEBUG_MODE)  meal.recommendations = Math.round(Math.random() * (100 - 1));
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');

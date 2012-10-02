@@ -460,7 +460,7 @@ function postrecommendation(mealid,cb){
 			
 		} else {
 			DEBUG_MODE && console.log('Recommendation post ID: ' + response.id);
-			api('/pushrecommendation?mealid='+mealid, function(response){
+			api('/pushrecommendation?mealid='+mealid+'&action_id='+response.id, function(response){
 				DEBUG_MODE && console.log("successfull pushed recommendation");
 				$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
 				cb();
