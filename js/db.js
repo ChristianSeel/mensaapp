@@ -648,7 +648,7 @@ function mealListTpl(data){
 	tpl += '<div class="innerwrapper">';
 	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
 	
-	tpl += '<h2>'+data.name+' </h2>';
+	tpl += '<h2>'+data.name+'</h2>';
 	
 	
 	if (typeof data.price !== "undefined" && data.price !== "undefined" && data.price !== "") {
@@ -670,13 +670,20 @@ function mealListTpl(data){
 
 
 function trimmingListTpl(data){
-	var tpl = '<div class="square trimming"><div class="innerwrapper">';
+	var tpl = '<div class="square trimming">';
+	
+	//if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="infoIcon"></span><p class="info blanktext">Infos: '+data.info+'</p>';
+	
+	
+	tpl += '<div class="innerwrapper">';
 	
 	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p class="label bold">'+data.label+'</p>';
 	
+	var infos = "";
+	
 	for (var i = 0; i < data.meals.length; i++) {
 		var trimming = data.meals[i];
-		tpl += '<h3>'+trimming.name+' </h3>';
+		tpl += '<h3>'+trimming.name+'</h3>';
 		
 		if (typeof trimming.price !== "undefined" && trimming.price !== "undefined" && trimming.price !== "") {
 			//var price = jQuery.parseJSON( data.price );
@@ -688,10 +695,20 @@ function trimmingListTpl(data){
 			tpl +='</p>';
 		}
 		
-		if (typeof trimming.info !== "undefined" && trimming.info !== "undefined" && trimming.info !== "") tpl += '<p class="info">Infos: '+trimming.info+'</p>';
+		if (typeof trimming.info !== "undefined" && trimming.info !== "undefined" && trimming.info !== "") {
+			infos += '<h3>'+trimming.name+'</h3><p>Infos: '+trimming.info+'</p>';
+		}
 	}
 	
-	tpl += '</div></div>';
+	
+	
+	tpl += '</div>';
+	
+	if (infos !== "") {
+		tpl += '<span class="infoIcon"></span><div class="info blanktext">'+infos+'</div>';
+	}
+	
+	tpl += '</div>';
 	
 	return tpl;
 }

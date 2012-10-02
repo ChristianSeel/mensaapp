@@ -630,24 +630,33 @@ body, #splashscreen
 	overflow: hidden
 	margin-top: -10px
 
-.meal.showInfo
-	left: -87%
 
-
-.meal
+.meal, .trimming
 	-webkit-transition-property:left
 	-webkit-transition-duration:500ms
 	left: 0
-	h2, .h2
+	h2
 		margin-top: 0
 		padding-right: 27px
+	h3
+		margin-top: 5px
+	h3:first-child
+		padding-right: 27px
 	.info
+		z-index: 100
 		position: absolute
+		top: 0
 		left: 100%
 		width: 90%
 		height: 100%
 		box-sizing: border-box
 		text-align: left
+		h3
+			margin-top: 0
+			padding-right: 0
+		p
+			text-align: left
+			margin-bottom: 5px
 	.label
 		font-weight: 600
 	.infoIcon
@@ -675,9 +684,8 @@ body, #splashscreen
 		background: transparent url(imagePath/icon-recommend@2x.png) center center no-repeat
 		background-size: 12px
 
-.trimming
-	h3
-		margin-top: 5px
+.meal.showInfo, .trimming.showInfo
+	left: -87%
 
 
 

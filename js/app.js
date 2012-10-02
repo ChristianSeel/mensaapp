@@ -401,7 +401,7 @@ $(function(){
 	
 
 	// show infos
-	$('.meal .infoIcon').live("click",function(e){
+	$('.meal .infoIcon, .trimming .infoIcon').live("click",function(e){
 		e.preventDefault();
 		var parent = $(this).parent('.square');
 		if (!parent.hasClass('showInfo') === true) {
@@ -411,7 +411,7 @@ $(function(){
 	});
 	
 	// hide infos
-	$('.meal.showInfo').live("click",function(e){
+	$('.meal.showInfo, .trimming.showInfo').live("click",function(e){
 		e.preventDefault();
 		$(this).removeClass('showInfo');
 	});
@@ -434,7 +434,6 @@ function removeMensaFromFavorite(mensaid) {
 	}, dbError, function(){});
 	return true;
 }
-
 
 
 function postrecommendation(mealid,cb){
