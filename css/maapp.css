@@ -50,7 +50,8 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 #headerleiste{z-index:500;height:26px;width:100%;position:absolute;top:60px;background:-webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(1, #f5f5f5));background:-webkit-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:-moz-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:-o-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:-ms-linear-gradient(top, #fff 0%, #f5f5f5 100%);background:linear-gradient(top, #fff 0%, #f5f5f5 100%)}
 .infoIcon{z-index:1100;width:36px;height:36px;position:absolute;top:0;right:1px;background:transparent url("../img/infoIcon@2x.png") center center no-repeat;-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px;text-indent:100%;white-space:nowrap;overflow:hidden;opacity:.9;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=90)}
 .navigationbar{z-index:2550;position:absolute;top:60px;width:100%;height:26px;text-align:center;-webkit-box-shadow:0 0 7px rgba(0,0,0,0.2);-moz-box-shadow:0 0 7px rgba(0,0,0,0.2);-o-box-shadow:0 0 7px rgba(0,0,0,0.2);-ms-box-shadow:0 0 7px rgba(0,0,0,0.2);box-shadow:0 0 7px rgba(0,0,0,0.2);border-bottom:1px solid #ccc;}
-.navigationbar h1{width:auto;height:26px;margin:0 40px;line-height:26px;font-size:11px;color:#555;text-align:center}
+.navigationbar h1{width:auto;height:26px;margin:0 60px;line-height:26px;font-size:11px;color:#555;text-align:center}
+.navigationbar .goback{position:absolute;top:0;left:0;height:12px;border-right:1px solid #ccc;padding:7px 10px}
 #tabbar{display:block;position:absolute;bottom:0;width:100%;height:49px;z-index:2000;background:-webkit-gradient(linear, left top, left bottom, color-stop(0, #fafafa), color-stop(1, #cecece));background:-webkit-linear-gradient(top, #fafafa 0%, #cecece 100%);background:-moz-linear-gradient(top, #fafafa 0%, #cecece 100%);background:-o-linear-gradient(top, #fafafa 0%, #cecece 100%);background:-ms-linear-gradient(top, #fafafa 0%, #cecece 100%);background:linear-gradient(top, #fafafa 0%, #cecece 100%);-webkit-box-shadow:0 0 4px rgba(0,0,0,0.3);-moz-box-shadow:0 0 4px rgba(0,0,0,0.3);-o-box-shadow:0 0 4px rgba(0,0,0,0.3);-ms-box-shadow:0 0 4px rgba(0,0,0,0.3);box-shadow:0 0 4px rgba(0,0,0,0.3);-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;border-top:1px solid #afafaf;}
 #tabbar ul{width:100%;height:49px;}
 #tabbar ul li{display:block;float:left;width:34.5%;height:100%;z-index:2010;-webkit-transition-property:box-shadow;-webkit-transition-duration:150ms;}
@@ -76,8 +77,9 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 #pullDown.flip .pullDownIcon{background-image:url("../img/pull-icon-flip@2x.png")}
 #pullDown.loading .pullDownIcon{background-image:url("../img/loading2x.gif");-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px}
 #pullDown .pullDownLabel{display:block;padding:10px 0 0 43px;font-weight:700;position:absolute;top:0;left:0}
-.locationspinner{margin-top:30px;padding-top:20px;background:transparent url("../img/loading2x.gif") top center no-repeat;-webkit-background-size:24px;-moz-background-size:24px;-o-background-size:24px;-ms-background-size:24px;background-size:24px}
+.smallspinner{margin-top:30px;padding-top:20px;background:transparent url("../img/loading2x.gif") top center no-repeat;-webkit-background-size:24px;-moz-background-size:24px;-o-background-size:24px;-ms-background-size:24px;background-size:24px}
 .blanktext{padding:15px 20px;text-shadow:0 1px 0 #fff;text-align:center}
+.fullwidth{width:100%;max-width:100%}
 #speiseplan .skipdayleft,#speiseplan .skipdayright{position:absolute;left:0;top:0;width:30px;height:26px;background:transparent url("../img/icon-arrow-left.png") center center no-repeat;-webkit-background-size:26px;-moz-background-size:26px;-o-background-size:26px;-ms-background-size:26px;background-size:26px}
 #speiseplan .skipdayright{left:auto;right:0;background-image:url("../img/icon-arrow-right.png")}
 #speiseplan .skipdayleft.inactive,#speiseplan .skipdayright.inactive{opacity:.4;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=40)}
@@ -97,6 +99,7 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .mensa .addFavorite.isfavorite{background-image:url("../img/icon-star-active.png")}
 .mensa .org{font-weight:600}
 .mensainfo .innerwrapper{padding-left:20px}
+.mensainfo .innerwrapper:after{content:"";display:block;position:absolute;width:40px;height:40px;right:0;top:0;background:transparent url("../img/infoIcon-dark@2x.png") center center no-repeat;-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px}
 .mensainfo:after{content:"";display:block;position:absolute;top:0;left:0;height:100%;width:6px;background:#78003c;-webkit-border-top-left-radius:4px;-webkit-border-bottom-left-radius:4px;-moz-border-radius-topleft:4px;-moz-border-radius-bottomleft:4px;border-top-left-radius:4px;border-bottom-left-radius:4px}
 .mealwrapper{position:relative;width:100%;overflow:hidden;margin-top:-10px}
 .meal,.trimming{-webkit-transition-property:left;-webkit-transition-duration:500ms;left:0;}

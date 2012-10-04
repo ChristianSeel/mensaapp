@@ -202,6 +202,13 @@ $(function(){
 	});
 	
 	
+	// goback
+	$('.goback').live("click",function(e) {
+		e.preventDefault();
+		jQT.goBack()
+	});
+	
+	
 	/*
 	 * Links
 	 */
@@ -283,10 +290,11 @@ $(function(){
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("go to speiseplan "+mensaid);
-		getMenu(mensaid, getDatestamp(), true);
-		setTimeout(function(){
+		//getMenu(mensaid, getDatestamp(), true);
+//		setTimeout(function(){
 			jQT.goTo("#speiseplan","slideleft");
-		}, 50);
+//		}, 50);
+		getMenu(mensaid, getDatestamp(), true);
 		$('#speiseplan .skipdayright').removeClass('inactive');
 		return false;
 	});
@@ -308,7 +316,17 @@ $(function(){
 	});
 	
 	
-	
+	$('.mensainfo').live("click",function(e){
+		e.preventDefault();
+		var mensaid = $(this).data('mensaid');
+		DEBUG_MODE && console.log("go to detailspage for mensa "+mensaid);
+		
+//		setTimeout(function(){
+			jQT.goTo("#mensa-details","slideleft");
+//		}, 50);
+		getMensaDetails(mensaid);
+		return false;
+	});
 	
 	
 	/*

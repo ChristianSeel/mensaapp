@@ -284,12 +284,19 @@ body, #splashscreen
 	h1
 		width: auto
 		height: 26px
-		margin: 0 40px
+		margin: 0 60px
 		line-height: 26px
 		font-size: 11px
 		color: #555
 		text-align: center
-
+	.goback
+		position: absolute
+		top: 0
+		left: 0
+		height: 12px
+		border-right: 1px solid #ccc
+		padding: 7px 10px
+	
 
 /*
  * Tab Bar
@@ -449,55 +456,6 @@ body, #splashscreen
 	left: 0
 
 	
-/*
-#pullDown
-	display: none
-	width: 100%
-	height: 30px
-	position: relative
-	top: -27px
-	margin-top: 0
-	margin-bottom: -30px
-	-webkit-transition-property:margin-top
-	-webkit-transition-duration:500ms
-
-.scrollrefresh
-	#pullDown
-		display: block
-	.content
-		margin-top: -20px
-
-#pullDown.loading
-	margin-top: 37px
-	
-#pullDown .pullDownIcon
-	display:block
-	width:30px
-	height:30px
-	margin-left: 10px
-	margin-right: 6px
-	background: url(imagePath/pull-icon@2x.png) center center no-repeat
-	background-size: 24px
-	-webkit-transition-property:-webkit-transform
-	-webkit-transition-duration:250ms
-
-#pullDown .pullDownIcon
-	-webkit-transform:rotate(0deg) translateZ(0)
-
-#pullDown.flip .pullDownIcon, #pullDown.loading .pullDownIcon
-	-webkit-transform:rotate(-180deg) translateZ(0)
-
-#pullDown.loading .pullDownIcon
-	background-image: url(imagePath/loading2x.gif)
-
-#pullDown .pullDownLabel
-	display: block
-	padding: 10px 0 0 43px
-	font-weight: 600
-	position: absolute
-	top: 0
-	left: 0
-*/
 
 /*
  *
@@ -505,7 +463,7 @@ body, #splashscreen
  *
  */
 
-.locationspinner
+.smallspinner
 	margin-top: 30px
 	padding-top: 20px
 	background: transparent url(imagePath/loading2x.gif) top center no-repeat
@@ -515,6 +473,10 @@ body, #splashscreen
 	padding: 15px 20px
 	text-shadow: 0 1px 0 white
 	text-align: center
+
+.fullwidth
+	width: 100%
+	max-width: 100%
 
 #speiseplan
 	.skipdayleft, .skipdayright
@@ -606,6 +568,16 @@ body, #splashscreen
 .mensainfo
 	.innerwrapper
 		padding-left: 20px
+	.innerwrapper:after	
+		content:""
+		display: block
+		position: absolute
+		width: 40px
+		height: 40px
+		right: 0
+		top: 0
+		background: transparent url(imagePath/infoIcon-dark@2x.png) center center no-repeat
+		background-size: 20px
 		
 .mensainfo:after
 	content: ""

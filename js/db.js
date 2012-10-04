@@ -259,7 +259,7 @@ function getMensenFromDB(listabc){
 				}
 				
 				if (i == len-1 && numberOfFavorites > 0) {
-					mensenliste.append('<div class="locationspinner"><p class="blanktext"><b>Mensen in der Nähe suchen...</b><br>Bestimme deinen Standort.</p></div>');
+					mensenliste.append('<div class="smallspinner"><p class="blanktext"><b>Mensen in der Nähe suchen...</b><br>Bestimme deinen Standort.</p></div>');
 					refreshScroll($('#mensen'), false);
 					$('#blocker').hide();
 					hideSplashscreen();
@@ -316,7 +316,7 @@ function getMensenFromDB(listabc){
 function listMensenByName(results,mensenliste){
 
 	$('#mensen .navigationbar h1').text("Mensa auswählen");
-	mensenliste.find('.locationspinner').remove();
+	mensenliste.find('.smallspinner').remove();
 	var len = results.rows.length;
 	var listed = 0;
 	var last_org = "";
@@ -343,7 +343,7 @@ function listMensenByDistance(results,mensenliste,location){
 	
 	$('#mensen .navigationbar h1').text("Mensen in deiner Nähe");
 	if (location.geoip == "true") mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
-	mensenliste.find('.locationspinner').remove();
+	mensenliste.find('.smallspinner').remove();
 	var listed = 0;
 	// sort by distance
 	var mensen = new Array();
@@ -396,6 +396,35 @@ function mensenListTpl(data){
 	return tpl;
 }
 
+
+
+
+
+function getMensaDetails(mensaid) {
+	
+	db.transaction(function(tx) {
+	 //   tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
+	    tx.executeSql('SELECT * FROM Mensen WHERE mensaid = '+mensaid , [],
+	    function(tx, results){
+	    //success
+	    	
+			var len = results.rows.length;
+			
+			if (len == 1) {
+				
+				var mensa = results.rows.item(0);
+				$('#mensa-details .content').html('<div class="square"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span></p><p>'+mensa.address+', '+mensa.postal+' '+mensa.city+'</p></div></div>');
+				//$('#mensa-details .content').append('<div class="square innerwrapper"><h4>Anschrift:</h4></div>');
+				$('#mensa-details .content').append('<div class="square"><img class="fullwidth" src="http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false" /></div>');
+			} else {
+				// mensa not found
+				// ...wired error, should not happen
+			}
+			
+		}, dbError);
+	}, dbError);
+	
+}
 
 
 
@@ -535,7 +564,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 	
 				if (mensalen == 1) {
 					var mensa = results.rows.item(0);
-					mensawrapper.html('<div class="square mensainfo"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck_string+'</span></p></div></div>');
+					mensawrapper.html('<div class="square mensainfo" data-mensaid="'+mensaid+'"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span><br><span class="lastcheck">Letzte Aktualisierung: '+mensa.lastcheck_string+'</span></p></div></div>');
 					
 					if (fetchFromApi === true && mensa.lastcheck < (getTimestamp()-(60*60*24)) && networkState==1) {
 						DEBUG_MODE && console.log("foodplan older than 24h -> get new foodplan from api");
