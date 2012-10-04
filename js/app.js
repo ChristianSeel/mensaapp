@@ -205,7 +205,7 @@ $(function(){
 	// goback
 	$('.goback').live("click",function(e) {
 		e.preventDefault();
-		jQT.goBack()
+		jQT.goBack();
 	});
 	
 	
@@ -327,6 +327,17 @@ $(function(){
 		getMensaDetails(mensaid);
 		return false;
 	});
+	
+	$('#mensa-details').bind("swipe",function(e,info) {
+		e.preventDefault();
+		DEBUG_MODE && console.log("swipe detected");
+		
+		if (info.direction == "right") {
+			jQT.goBack();
+		}
+	});
+	
+	
 	
 	
 	/*

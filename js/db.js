@@ -415,7 +415,13 @@ function getMensaDetails(mensaid) {
 				var mensa = results.rows.item(0);
 				$('#mensa-details .content').html('<div class="square"><div class="innerwrapper"><h3>' + mensa.name + '</h3><p><span class="org bold">'+mensa.org+'</span></p><p>'+mensa.address+', '+mensa.postal+' '+mensa.city+'</p></div></div>');
 				//$('#mensa-details .content').append('<div class="square innerwrapper"><h4>Anschrift:</h4></div>');
-				$('#mensa-details .content').append('<div class="square"><img class="fullwidth" src="http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false" /></div>');
+				if (devicePlatform == "ios") {
+					var href = 'http://maps.apple.com/maps?q='+mensa.coord_lat+','+mensa.coord_lon+'';
+				} else {
+					var href = 'http://maps.google.com/maps?q='+mensa.coord_lat+','+mensa.coord_lon+'';
+				}
+				
+				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank"><img class="fullwidth" src="http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false" /></a></div>');
 			} else {
 				// mensa not found
 				// ...wired error, should not happen
