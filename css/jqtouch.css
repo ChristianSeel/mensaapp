@@ -589,7 +589,7 @@ body {
 }
 
 
-#jqt .button, #jqt .back, #ps-wrapper .back, #jqt .cancel, #jqt .add {
+#jqt .back, #ps-wrapper .back, #jqt .cancel, #jqt .add {
   position: absolute;
   overflow: hidden;
   width: auto;
@@ -620,7 +620,7 @@ body {
   background-image: linear-gradient(top, #2f3031, #161717 50%, #0a0a0a 51%, #000000);
 }
 
-#jqt .button.active, #jqt .back.active, #ps-wrapper .back.active, #jqt .cancel.active, #jqt .add.active {
+#jqt .back.active, #ps-wrapper .back.active, #jqt .cancel.active, #jqt .add.active {
   border-color: black;
   background-image: none;
   background-color: black;
