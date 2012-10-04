@@ -290,11 +290,11 @@ $(function(){
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("go to speiseplan "+mensaid);
-		//getMenu(mensaid, getDatestamp(), true);
-//		setTimeout(function(){
-			jQT.goTo("#speiseplan","slideleft");
-//		}, 50);
 		getMenu(mensaid, getDatestamp(), true);
+		setTimeout(function(){
+			jQT.goTo("#speiseplan","slideleft");
+		}, 50);
+		
 		$('#speiseplan .skipdayright').removeClass('inactive');
 		return false;
 	});
@@ -320,11 +320,11 @@ $(function(){
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("go to detailspage for mensa "+mensaid);
-		
+		getMensaDetails(mensaid);
 //		setTimeout(function(){
 			jQT.goTo("#mensa-details","slideleft");
 //		}, 50);
-		getMensaDetails(mensaid);
+		
 		return false;
 	});
 	

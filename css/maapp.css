@@ -93,13 +93,12 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .smallinnerwrapper{padding:5px 15px;line-height:1.5}
 .square.error{-webkit-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);-moz-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);-o-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);-ms-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3)}
 .mensa .innerwrapper{padding-left:35px;padding-right:35px}
-.mensa .innerwrapper:after{content:"";display:block;position:absolute;top:50%;left:7px;margin-top:-11px;width:21px;height:21px;-webkit-background-size:21px;-moz-background-size:21px;-o-background-size:21px;-ms-background-size:21px;background-size:21px}
-.mensa .innerwrapper:after{right:7px;left:auto;background-image:url("../img/icon-round-arrowright.png")}
+.mensa .innerwrapper:after{content:"";display:block;position:absolute;top:50%;right:7px;margin-top:-13px;width:22px;height:26px;-webkit-background-size:26px;-moz-background-size:26px;-o-background-size:26px;-ms-background-size:26px;background-size:26px;background-image:url("../img/icon-arrow-right.png");opacity:.85;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=85)}
 .mensa .addFavorite{display:block;position:absolute;top:0;left:0;width:35px;height:100%;background:transparent url("../img/icon-star.png") center center no-repeat;-webkit-background-size:21px;-moz-background-size:21px;-o-background-size:21px;-ms-background-size:21px;background-size:21px}
 .mensa .addFavorite.isfavorite{background-image:url("../img/icon-star-active.png")}
 .mensa .org{font-weight:600}
 .mensainfo .innerwrapper{padding-left:20px}
-.mensainfo .innerwrapper:after{content:"";display:block;position:absolute;width:40px;height:40px;right:0;top:0;background:transparent url("../img/infoIcon-dark@2x.png") center center no-repeat;-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px}
+.mensainfo .innerwrapper:after{content:"";display:block;position:absolute;width:22px;height:26px;right:7px;top:50%;margin-top:-13px;background:transparent url("../img/icon-arrow-right.png") center center no-repeat;-webkit-background-size:26px;-moz-background-size:26px;-o-background-size:26px;-ms-background-size:26px;background-size:26px;opacity:.85;filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=85)}
 .mensainfo:after{content:"";display:block;position:absolute;top:0;left:0;height:100%;width:6px;background:#78003c;-webkit-border-top-left-radius:4px;-webkit-border-bottom-left-radius:4px;-moz-border-radius-topleft:4px;-moz-border-radius-bottomleft:4px;border-top-left-radius:4px;border-bottom-left-radius:4px}
 .mealwrapper{position:relative;width:100%;overflow:hidden;margin-top:-10px}
 .meal,.trimming{-webkit-transition-property:left;-webkit-transition-duration:500ms;left:0;}
