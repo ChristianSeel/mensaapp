@@ -173,7 +173,7 @@ function checkLastUpdate(tx, results) {
 
 
 
-function getMensenFromApi(listabc) {
+function getMensenFromApi(listcitys) {
 	
 	//$('#busy').fadeIn();
 	
@@ -207,7 +207,7 @@ function getMensenFromApi(listabc) {
 			}, dbError, function(){
 				//success
 				DEBUG_MODE && console.log("mensen successfull updated");
-				getMensenFromDB(listabc);
+				getMensenFromDB(listcitys);
 			});
 		} else {
 			DEBUG_MODE && console.log("no mensen returned by api");
@@ -243,47 +243,54 @@ function getMensenFromApi(listabc) {
  *
  */
 
-function getMensenFromDB(listabc){
+function getMensenFromDB(listcitys,city){
 	
-	if (listabc == undefined)
-		listabc = false;
+	if (typeof listcitys == "undefined") listcitys = false;
+	if (typeof city == "undefined") city = false;
 	
-	DEBUG_MODE && console.log("requesting mensen from db with "+ listabc);
+	DEBUG_MODE && console.log("requesting mensen from db with listcitys: "+ listcitys);
+	
+	var wherec = "";
+	if (typeof city != "undefined" && city !== false) wherec = 'WHERE Mensen.city = "'+city+'" ';
+	if (listcitys && !city) {groupbyc = 'GROUP BY Mensen.city ORDER BY city ASC, name ASC ';} else if (listcitys) {groupbyc = 'ORDER BY name ASC'} else {groupbyc = 'ORDER BY org ASC, name ASC'}
+	var query = 'SELECT * FROM Mensen LEFT OUTER JOIN FavoriteMensen ON Mensen.mensaid = FavoriteMensen.mensaid '+wherec+groupbyc+'';
+	console.log(query);
 	
 	db.transaction(function(tx) {
 	 //   tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
-	    tx.executeSql('SELECT * FROM Mensen LEFT OUTER JOIN FavoriteMensen ON Mensen.mensaid = FavoriteMensen.mensaid ORDER BY org ASC, name ASC' , [],
+	    tx.executeSql(query , [],
 	    function(tx, results){
 	    //success
-	    	
+
 			var len = results.rows.length;
 			
 			if (len == 0) {
 				$('#busy').fadeIn();
-				getMensenFromApi(listabc);
+				getMensenFromApi(listcitys);
 				return true;
 			}
+			DEBUG_MODE && console.log(len + " Mensen von DB erhalten.");
 			
 			var mensenliste = $('#mensen .content').html('<ul class="mensen"></ul>');
 			
 			var numberOfFavorites = 0;
-			for (var i=0; i<len; i++){
-				mensa = results.rows.item(i);
-				if (mensa['isfavorite'] == 1) {
-					numberOfFavorites++;
-					mensenliste.append(mensenListTpl(mensa));
-				}
-				
-				if (i == len-1 && numberOfFavorites > 0) {
-					mensenliste.append('<div class="smallspinner"><p class="blanktext"><b>Mensen in der Nähe suchen...</b><br>Bestimme deinen Standort.</p></div>');
-					refreshScroll($('#mensen'), false);
-					$('#blocker').hide();
-					hideSplashscreen();
-				}
-		    }
-
 			
-			if (listabc == false) {
+			if (listcitys == false) {
+				for (var i=0; i<len; i++){
+					mensa = results.rows.item(i);
+					if (mensa['isfavorite'] == 1) {
+						numberOfFavorites++;
+						mensenliste.append(mensenListTpl(mensa));
+					}
+					
+					if (i == len-1 && numberOfFavorites > 0) {
+						mensenliste.append('<div class="smallspinner"><p class="blanktext"><b>Mensen in der Nähe suchen...</b><br>Bestimme deinen Standort.</p></div>');
+						refreshScroll($('#mensen'), false);
+						$('#blocker').hide();
+						hideSplashscreen();
+					}
+			    }
+			
 				DEBUG_MODE && console.log("requesting device location...");
 				
 				// get curren user position
@@ -303,7 +310,7 @@ function getMensenFromDB(listabc){
 							},
 							function(error){
 								DEBUG_MODE && console.log("could not get geoip: "+error.description);
-								listMensenByName(results,mensenliste);
+								listMensenByOrg(results,mensenliste, true, false);
 							}
 						);
 					},
@@ -316,8 +323,8 @@ function getMensenFromDB(listabc){
 				);
 				
 			} else {
-				DEBUG_MODE && console.log("abc listing required");
-				listMensenByName(results,mensenliste);
+				DEBUG_MODE && console.log("city listing required");
+				listMensenByOrg(results,mensenliste, listcitys, city);
 			}
 		    
 	    }, dbError);
@@ -329,34 +336,47 @@ function getMensenFromDB(listabc){
 
 
 
-function listMensenByName(results,mensenliste){
+function listMensenByOrg(results,mensenliste, listcitys, city){
 
-	$('#mensen .navigationbar h1').text("Mensa auswählen");
+	$('#mensen .getlocation').show();
 	mensenliste.find('.smallspinner').remove();
+	
+	if (city) {
+		mensenliste.append('<div class="square gray"><h3 class="smallinnerwrapper">'+city+'</h3></div>');
+		$('#mensen .navigationbar h1').text("Mensa auswählen");
+		$('#mensen .mensagoback').unbind("click").bind("click",function(){
+			getMensenFromDB(true,false)
+		}).show();
+	} else {
+		$('#mensen .navigationbar h1').text("Stadt auswählen");
+		$('#mensen .mensagoback').hide();
+	}
+		
 	var len = results.rows.length;
-	var listed = 0;
-	var last_org = "";
 	for (var i=0; i<len; i++){
-		if (results.rows.item(i).isfavorite == 1) continue;
+		//if (results.rows.item(i).isfavorite == 1) continue;
 		var mensa = results.rows.item(i);
-		if (last_org !== mensa.org) {
-			mensenliste.append('<div class="square gray"><h3 class="smallinnerwrapper">'+mensa.org+'</h3></div>');
+		
+		if (!city) {
+			mensenliste.append('<div class="square cityselector" data-city="'+mensa.city+'"><h3 class="innerwrapper">'+mensa.city+'</h3></div>');
+		} else {
+			mensenliste.append(mensenListTpl( mensa ));
 		}
-		last_org = mensa.org;
-		mensenliste.append(mensenListTpl( mensa ));
-		listed++;
+		
+
 		if (i == (len - 1)) {
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
 			$('#blocker').hide();
 			hideSplashscreen();
-			DEBUG_MODE && console.log("Listed "+listed+" Mensen.");
 		}
 	}
 }
 
 function listMensenByDistance(results,mensenliste,location){
 	
+	$('#mensen .getlocation').hide();
+	$('#mensen .mensagoback').hide();
 	$('#mensen .navigationbar h1').text("Mensen in deiner Nähe");
 	if (location.geoip == "true") mensenliste.prepend('<div class="square error"><p class="innerwrapper">Wir konnte deinen aktuellen Standort nur ungefähr lokalisieren. Die nachfolgenden Entfernungen sind daher sehr ungenau.</p></div>');
 	mensenliste.find('.smallspinner').remove();

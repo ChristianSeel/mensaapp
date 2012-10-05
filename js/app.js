@@ -272,10 +272,7 @@ $(function(){
 	
 	
 	
-	$('#mensen .linkToAbc').live("click",function(e){
-		e.preventDefault();
-		getMensenFromDB(true);
-	});
+	
 	
 	
 	
@@ -285,6 +282,17 @@ $(function(){
 	 * Mensa
 	 *
 	 */
+	
+	
+	
+	$('.cityselector').live("click",function(e){
+		e.preventDefault();
+		var city = $(this).data('city');
+		DEBUG_MODE && console.log("show mensen of "+city);
+		getMensenFromDB(true,city);
+		
+		return false;
+	});
 	
 	$('.mensa').live("click",function(e){
 		e.preventDefault();
@@ -315,6 +323,14 @@ $(function(){
 		return false;
 	});
 	
+	$('#mensen .linkToAbc').live("click",function(e){
+		e.preventDefault();
+		getMensenFromDB(true, false);
+	});
+	
+	$('#mensen .getlocation').bind("click",function(e){
+		getMensenFromDB(false, false);
+	});
 	
 	$('.mensainfo').live("click",function(e){
 		e.preventDefault();
@@ -398,6 +414,8 @@ $(function(){
 		$('#busy').fadeIn();
 		$('#selectmeal').fadeOut();
 	});
+	
+	
 	
 	
 	
