@@ -343,7 +343,7 @@ $(function(){
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("checkin into mensa "+mensaid);
 		
-/*		if (!fbuser) {
+		if (!fbuser) {
 			navigator.notification.confirm(
 				'Für einen Check-in musst du dich zuerst mit Hilfe von Facebook einloggen.',  // message
 				function(index){
@@ -354,7 +354,7 @@ $(function(){
 			);
 			return false;
 		}	
-*/		
+		
 		
 		db.transaction(function(tx) {
 		    tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + getDatestamp() + '" ORDER BY recommendations ASC, label DESC, mealid DESC' , [],
