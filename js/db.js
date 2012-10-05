@@ -196,8 +196,6 @@ function getMensenFromApi(listabc) {
 						}
 					}
 					
-					if (mensa.mensaid == 1) mensa.checkinid = "174750605882595";
-					
 					tx.executeSql('INSERT OR IGNORE INTO Mensen (mensaid) VALUES ('+mensa.mensaid+')');
 					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, postal=?, city=?, address=?, lastcheck=?, lastcheck_string=?, lastcheck_recommendations=?, coord_lon=?, coord_lat=?, checkinid=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.postal, mensa.city, mensa.address, mensa.lastcheck, mensa.lastcheck_string, 0, mensa.coord.lon, mensa.coord.lat, mensa.checkinid]);
 					
