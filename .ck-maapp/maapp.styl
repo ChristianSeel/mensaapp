@@ -178,6 +178,68 @@ body, #splashscreen
 #jqt
 	z-index: 1000
 
+#selectmeal
+	@extend #busy
+	z-index: 5000
+	padding: 15% 10%
+	.selectwrapper
+		position: relative
+		width: 80%
+		height: 75%
+		background: #fff
+		border-radius: 8px
+		background: linear-gradient(top, #ffffff, #f5f5f5)
+		border: 1px solid #e0e0e0
+		overflow: hidden
+	p.header
+		@extend h2
+		height: 30px
+		margin: 0
+		padding-top: 10px
+		text-align: center
+		background: linear-gradient(top, #fafafa, #e5e5e5)
+		border-bottom: 1px solid #dadada
+		border-radius: top 8px
+	.scrollwrapper
+		position: absolute
+		top: 41px
+		bottom: 35px
+		width: 100%
+		overflow: hidden
+		ul
+			li
+				position: relative
+				display: block
+				padding: 12px 18px 12px 30px
+				line-height: 1.5
+				font-size: 12px
+				background: linear-gradient(top, #ffffff, #fafafa)
+				border-bottom: 1px solid #eaeaea
+			li:after
+				content:""
+				display: block
+				position: absolute
+				width: 22px
+				height: 22px
+				left: 7px
+				top: 7px
+				background: transparent url(imagePath/icon-arrow-right.png) center center no-repeat
+				background-size: 26px
+				opacity: 0.85
+	p.footer	
+		@extend h3
+		position: absolute
+		bottom: 0
+		height: 27px
+		width: 100%
+		margin: 0
+		padding-top: 7px
+		text-align: center
+		background: linear-gradient(top, #fafafa, #e5e5e5)
+		border-top: 1px solid #e0e0e0
+		border-radius: bottom 8px
+	
+	
 
 
 .spinner
@@ -389,24 +451,22 @@ body, #splashscreen
  * ScrollWrapper
  */
 
-.scrollwrapper
-	width: 100%
-	position: absolute
-	top: 0px
-	bottom: 49px
-	z-index: 15
-	overflow: hidden
-	margin-top: 86px
-	//-webkit-perspective: 1000
-	//-webkit-backface-visibility: hidden
-	
-.scrollpanel
-	position: relative
-	width: 100%
-	min-height: 100%
-	box-sizing:border-box
-	position: relative
-	padding: 0 5px 15px
+#jqt
+	.scrollwrapper
+		width: 100%
+		position: absolute
+		top: 0px
+		bottom: 49px
+		z-index: 15
+		overflow: hidden
+		margin-top: 86px
+	.scrollpanel
+		position: relative
+		width: 100%
+		min-height: 100%
+		box-sizing:border-box
+		position: relative
+		padding: 0 5px 15px
 
 
 .scrollrefresh
@@ -477,6 +537,7 @@ body, #splashscreen
 .fullwidth
 	width: 100%
 	max-width: 100%
+	height: auto
 
 #speiseplan
 	.skipdayleft, .skipdayright

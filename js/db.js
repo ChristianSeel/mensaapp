@@ -35,6 +35,14 @@ function dbError(error) {
 }
 
 
+/*
+ * required objects
+ */
+
+var mensaobj = ['mensaid','name','org','country','area','postal','city','address','lastcheck','lastcheck_string','coord','checkinid'];
+var mealobj = ['mealid','name','label','price','info','recommendations'];
+
+
 
 /*
  *
@@ -45,7 +53,7 @@ function dbError(error) {
 function createDBTables(tx) {
 		
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Settings (key unique, val)');
-	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, lastcheck_string, lastcheck_recommendations, coord_lon, coord_lat)');
+	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, lastcheck_string, lastcheck_recommendations, coord_lon, coord_lat, checkinid)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS FavoriteMensen (mensaid unique, isfavorite)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Meals (mealid unique, datestamp, mensaid, name, label, price, info, recommendations)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Foodplans (key unique, mensaid, datestamp, trimmings)');
@@ -180,8 +188,18 @@ function getMensenFromApi(listabc) {
 				for (var i in results.mensen) {
 					var mensa = results.mensen[i];
 					
+					for (var k=0;k<mensaobj.length;k++) {
+						key = mensaobj[k];
+						if (typeof mensa[key] == "undefined") {
+							DEBUG_MODE && console.log(key + " is undefined for mensa " + mensa.mensaid);
+							mensa[key] = "";
+						}
+					}
+					
+					if (mensa.mensaid == 1) mensa.checkinid = "174750605882595";
+					
 					tx.executeSql('INSERT OR IGNORE INTO Mensen (mensaid) VALUES ('+mensa.mensaid+')');
-					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, postal=?, city=?, address=?, lastcheck=?, lastcheck_string=?, lastcheck_recommendations=?, coord_lon=?, coord_lat=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.postal, mensa.city, mensa.address, mensa.lastcheck, mensa.lastcheck_string, 0, mensa.coord.lon, mensa.coord.lat]);
+					tx.executeSql('UPDATE Mensen SET name=?, org=?, country=?, area=?, postal=?, city=?, address=?, lastcheck=?, lastcheck_string=?, lastcheck_recommendations=?, coord_lon=?, coord_lat=?, checkinid=? WHERE mensaid='+mensa.mensaid, [mensa.name, mensa.org, mensa.country, mensa.area, mensa.postal, mensa.city, mensa.address, mensa.lastcheck, mensa.lastcheck_string, 0, mensa.coord.lon, mensa.coord.lat, mensa.checkinid]);
 					
 					tx.executeSql('INSERT OR IGNORE INTO FavoriteMensen (mensaid,isfavorite) VALUES ('+mensa.mensaid+',0)');
 				}
@@ -403,7 +421,6 @@ function mensenListTpl(data){
 function getMensaDetails(mensaid) {
 	
 	db.transaction(function(tx) {
-	 //   tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
 	    tx.executeSql('SELECT * FROM Mensen WHERE mensaid = '+mensaid , [],
 	    function(tx, results){
 	    //success
@@ -421,9 +438,9 @@ function getMensaDetails(mensaid) {
 					var href = 'http://maps.google.com/maps?q='+mensa.coord_lat+','+mensa.coord_lon+'';
 				}
 				
-				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank"><img class="fullwidth" src="http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false" /></a></div>');
+				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank"><img class="fullwidth" src="http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false"  width="300" height="220" /></a></div>');
 				
-				$('#mensa-details .content').append('<a id="mensacheckin" mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-In via Facebook</a>');
+				if (mensa.checkinid != "") $('#mensa-details .content').append('<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>');
 			} else {
 				// mensa not found
 				// ...wired error, should not happen
@@ -653,7 +670,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 									speiseplan.prepend(mealListTpl(meal));
 					
 									if (i == len - 1) { // last loop
-									
+										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend('<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>');
 										speiseplan.fadeIn(150);
 					    				refreshScroll($('#speiseplan'),true);
 					    				$('#busy').fadeOut();
@@ -680,15 +697,15 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 function mealListTpl(data){
 	var tpl = '<div class="square meal" data-mealid="'+data.mealid+'">';
 	
-	if (typeof data.info !== "undefined" && data.info !== "undefined" && data.info !== "") tpl += '<span class="infoIcon"></span><p class="info blanktext">Infos: '+data.info+'</p>';
+	if (data.info !== "") tpl += '<span class="infoIcon"></span><p class="info blanktext">Infos: '+data.info+'</p>';
 	
 	tpl += '<div class="innerwrapper">';
-	if (typeof data.label !== "undefined" && data.label !== "undefined" && data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
+	if (data.label !== "") tpl += '<p><span class="label">'+data.label+'</span></p>';
 	
 	tpl += '<h2>'+data.name+'</h2>';
 	
 	
-	if (typeof data.price !== "undefined" && data.price !== "undefined" && data.price !== "") {
+	if (data.price !== "") {
 		var price = jQuery.parseJSON( data.price );
 		tpl += '<p><span class="price">';
 			for (p in price) {
@@ -698,7 +715,6 @@ function mealListTpl(data){
 		tpl +='</span></p>';
 	}
 	
-	//tpl = tpl.substr(0, tpl.length -4);
 	
 	tpl += '</div><p class="recommendations"><span class="value">'+data.recommendations+'</span> Personen empfehlen dieses Gericht.</p></div>';
 
@@ -779,25 +795,23 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 				for (var j = 0; j < foodplan.meals.length; j++) {
 					var meal = foodplan.meals[j];
 					
-					if ( typeof meal.label == "undefined")
-						meal.label = "";
-						
-					if ( typeof meal.info == "undefined")
-						meal.info = "";
-					
-					if ( typeof meal.name == "undefined")
-						meal.name = "";
-					
 					if ( typeof meal.price == "undefined") {
 						meal.price = "";
 					} else {
 						meal.price = JSON.stringify(meal.price);
 					}
 						
-					if ( typeof meal.recommendations == "undefined")
+					if ( typeof meal.recommendations == "undefined") {
 						meal.recommendations = 0;
+					}
 					
-					//if (DEBUG_MODE)  meal.recommendations = Math.round(Math.random() * (100 - 1));
+					for (var k=0;k<mealobj.length;k++) {
+						key = mealobj[k];
+						if (typeof meal[key] == "undefined") {
+							DEBUG_MODE && console.log(key + " is undefined for meal " + meal.mealid);
+							meal[key] = "";
+						}
+					}
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
 					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
@@ -850,15 +864,6 @@ function getMealsFromApi(mensaid, datestamp) {
 				for (var j = 0; j < foodplan.meals.length; j++) {
 					var meal = foodplan.meals[j];
 					
-					if ( typeof meal.label == "undefined")
-						meal.label = "";
-						
-					if ( typeof meal.info == "undefined")
-						meal.info = "";
-					
-					if ( typeof meal.name == "undefined")
-						meal.name = "";
-					
 					if ( typeof meal.price == "undefined") {
 						meal.price = "";
 					} else {
@@ -867,7 +872,14 @@ function getMealsFromApi(mensaid, datestamp) {
 						
 					if ( typeof meal.recommendations == "undefined") {
 						meal.recommendations = 0;
-						//meal.recommendations = Math.round(Math.random() * (100 - 1)) + 100;
+					}
+					
+					for (var k=0;k<mealobj.length;k++) {
+						key = mealobj[k];
+						if (typeof meal[key] == "undefined") {
+							DEBUG_MODE && console.log(key + " is undefined for meal " + meal.mealid);
+							meal[key] = "";
+						}
 					}
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');

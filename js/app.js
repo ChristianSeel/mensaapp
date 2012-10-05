@@ -338,6 +338,67 @@ $(function(){
 	});
 	
 	
+	$('#mensacheckin').live("click",function(e){
+		e.preventDefault();
+		var mensaid = $(this).data('mensaid');
+		DEBUG_MODE && console.log("checkin into mensa "+mensaid);
+		
+/*		if (!fbuser) {
+			navigator.notification.confirm(
+				'Für einen Check-in musst du dich zuerst mit Hilfe von Facebook einloggen.',  // message
+				function(index){
+					if (index==1) fbLogin();
+				},              // callback to invoke with index of button pressed
+				"Login erforderlich",            // title
+				'Einloggen,Abbrechen'          // buttonLabels
+			);
+			return false;
+		}	
+*/		
+		
+		db.transaction(function(tx) {
+		    tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + getDatestamp() + '" ORDER BY recommendations ASC, label DESC, mealid DESC' , [],
+		    function(tx, results){
+		    //success
+		    	
+		    	var len = results.rows.length;
+				DEBUG_MODE && console.log(len + " meals found");
+				
+				if (len == 0) {
+					doMensaCheckin(0,mensaid);
+					return;
+				} else {
+					$('#selectmeal ul').html('');
+					for (var i = 0; i < len; i++) {
+						meal = results.rows.item(i);
+						$('#selectmeal ul').append('<li data-mealid="'+meal.mealid+'">'+meal.name+'</li>');
+		
+						if (i == len - 1) { // last loop
+							$('#selectmeal ul').append('<li data-mealdid="0" data-mensaid="'+mensaid+'" class="bold">Check-in ohne weitere Angaben</li>');
+							$('#selectmeal').fadeIn(150);
+		    				refreshScroll($('#selectmeal'),true);
+						}
+					}
+				}
+				
+			}, dbError);
+		}, dbError);
+
+		return false;
+	});
+	
+	$('#selectmeal p.footer').bind("click",function(){
+		$('#selectmeal').fadeOut();
+	});
+	
+	$('#selectmeal ul li').live("click",function(){
+		var mealid = $(this).data("mealid");
+		mensaid = $(this).data('mensaid');
+		doMensaCheckin(mealid,mensaid);
+		$('#busy').fadeIn();
+		$('#selectmeal').fadeOut();
+	});
+	
 	
 	
 	/*
@@ -465,6 +526,35 @@ function removeMensaFromFavorite(mensaid) {
 }
 
 
+
+
+// fb login function
+function fbLogin(){
+	FB.login(
+		function(response) {
+			//callback
+		},
+		{ scope: fbAppScope }
+	);
+}
+
+function fbLogout(){
+	
+	$('#busy').fadeIn();
+	$('#konto .scrollpanel .online').fadeOut();
+
+	FB.logout(function(response) {
+		DEBUG_MODE && console.log("[Facebook] Logout function");
+		$('#konto .scrollpanel .offline').show(function(){
+			refreshScroll($('#konto'));
+			$('#busy').fadeOut();
+		});
+		
+		$('#konto .scrollpanel .online').html("");
+	});
+}
+
+
 function postrecommendation(mealid,cb){
 	
 	if (cb == null) cb = function(){};
@@ -506,35 +596,96 @@ function postrecommendation(mealid,cb){
 
 
 
-// fb login function
-function fbLogin(){
-	FB.login(
-		function(response) {
-			//callback
-		},
-		{ scope: fbAppScope }
-	);
-}
-
-function fbLogout(){
+function doMensaCheckin(mealid, mensaid) {
 	
-	$('#busy').fadeIn();
-	$('#konto .scrollpanel .online').fadeOut();
+	var mensaid = mensaid;
+	if (typeof mealid == "undefined") mealid = 0;
+	DEBUG_MODE && console.log("check-in for mealid "+ mealid + " at mensa "+ mensaid);
+	
+	
+	db.transaction(function(tx) {
+		tx.executeSql('SELECT * FROM Meals WHERE mealid = '+mealid , [],
+		function(tx, results){
+			
+			if (results.rows.length == 1) {
+				var meal = results.rows.item(0);
+				mensaid = meal.mensaid;
+			}
+				
+				DEBUG_MODE && console.log("request for mensa "+mensaid+" data.");
+				db.transaction(function(tx) {
+				    tx.executeSql('SELECT * FROM Mensen WHERE mensaid = '+mensaid , [],
+				    function(tx, results){
+				    //success
+				    	
+						if (results.rows.length == 1) {
+							var mensa = results.rows.item(0);
+							
+							if (mensa.checkinid == "") {
+								$('#busy').fadeOut();
+								navigator.notification.alert(
+									"Ein Check-in in dieser Mensa ist leider nicht möglich. Uns fehlt der Facebook-Ort dieser Mensa.",  // message
+									alertDismissed,         // callback
+									"Fehler",            // title
+									'OK'                  // buttonName
+								);
+								return;
+							}
+							
+							var postmessage = "Ich bin hier...";
+							
+							if (mealid != 0) {
+								
+								postmessage = meal.name;
+								
+							}
+							
+							console.log('process checkin with message "'+postmessage+'" at location id '+mensa.checkinid);
 
-	FB.logout(function(response) {
-		DEBUG_MODE && console.log("[Facebook] Logout function");
-		$('#konto .scrollpanel .offline').show(function(){
-			refreshScroll($('#konto'));
-			$('#busy').fadeOut();
-		});
-		
-		$('#konto .scrollpanel .online').html("");
-	});
+							
+							FB.api('/'+fbuser.id+'/feed', 'post', {access_token: fbaccessToken, message: postmessage, place: mensa.checkinid}, function(response) {
+								DEBUG_MODE && console.log(response);
+								
+								$('#busy').fadeOut();
+								if (!response || response.error) {
+									navigator.notification.alert(
+										"Es trat ein Fehler bei Facebook auf.",  // message
+										alertDismissed,         // callback
+										"Fehler",            // title
+										'OK'                  // buttonName
+									);
+									
+								} else {
+									DEBUG_MODE && console.log('Post ID: ' + response.id);
+									navigator.notification.alert(
+										"Dein Check-in wurde auf Facebook veröffentlicht.",  // message
+										alertDismissed,         // callback
+										"Check-in erfolgreich",            // title
+										'OK'                  // buttonName
+									);
+								}
+							});
+			
+						} else {
+							// mensa not found
+							// ...wired error, should not happen
+							$('#busy').fadeOut();
+							navigator.notification.alert(
+								"Es trat ein Fehler auf.",  // message
+								alertDismissed,         // callback
+								"Fehler",            // title
+								'OK'                  // buttonName
+							);
+							
+						}
+						
+					}, dbError);
+				}, dbError); // mensa
+				
+				
+		}, dbError);
+	}, dbError); // meal
 }
-
-
-
-
 
 
 
