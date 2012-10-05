@@ -477,10 +477,11 @@ $(function(){
 		var mealwrapper = $(this).parent('.meal');
 		var mealid = mealwrapper.data('mealid');
 		var mealname = $('h2',mealwrapper).text();
+		var datestamp = $('#speiseplan').data('datestamp');
 		navigator.notification.confirm(
 			'Möchtest du '+ mealname +' empfehlen?',  // message
 			function(index){
-				if (index==1) postrecommendation(mealid);
+				if (index==1) postrecommendation(mealid,datestamp);
 			},              // callback to invoke with index of button pressed
 			"Empfehlung veröffentlichen",            // title
 			'Empfehlen,Abbrechen'          // buttonLabels
@@ -554,13 +555,21 @@ function fbLogout(){
 	});
 }
 
-
-function postrecommendation(mealid,cb){
 	
-	if (cb == null) cb = function(){};
+	
+function postrecommendation(mealid,datestamp){
+	
+	if (typeof datestamp == "undefined") datestamp = getDatestamp();
 	$('#busy').fadeIn();
 	var url = 'http://mensaapp.de/recommendation/'+mealid+'/';
-	FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', { access_token: fbaccessToken, meal: url}, function(response) {
+	
+	timezoneOffset = (new Date().getTimezoneOffset()/60) * -1;
+	if (timezoneOffset > 0) { timezoneOffset = '+'+ pad(timezoneOffset,2);
+		} else { timezoneOffset = '-'+ pad(timezoneOffset*-1,2);}
+	var postobj = {meal: url, end_time: datestamp+'T16:00:00'+timezoneOffset+':00'};
+	postobj['fb:explicitly_shared'] = true;
+
+	FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', postobj, function(response) {
 		DEBUG_MODE && console.log(response);
 		
 		if (!response || response.error) {
@@ -643,7 +652,7 @@ function doMensaCheckin(mealid, mensaid) {
 							console.log('process checkin with message "'+postmessage+'" at location id '+mensa.checkinid);
 
 							
-							FB.api('/'+fbuser.id+'/feed', 'post', {access_token: fbaccessToken, message: postmessage, place: mensa.checkinid}, function(response) {
+							FB.api('/'+fbuser.id+'/feed', 'post', {message: postmessage, place: mensa.checkinid}, function(response) {
 								DEBUG_MODE && console.log(response);
 								
 								$('#busy').fadeOut();
