@@ -390,9 +390,10 @@ function listMensenByDistance(results,mensenliste,location){
 		if (mensa['isfavorite'] == 1) continue;
 		
 		// calculate distance
-		var dx = 111.3 * Math.cos((location.lat + mensa['coord_lat'])/2*0.01745) * (location.lon - mensa['coord_lon']);
-		var dy = 111.3 * (location.lat - mensa['coord_lat']);
-		mensa['distance'] = roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
+		//var dx = 111.3 * Math.cos((location.lat + mensa['coord_lat'])/2*0.01745) * (location.lon - mensa['coord_lon']);
+		//var dy = 111.3 * (location.lat - mensa['coord_lat']);
+		//mensa['distance'] = roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
+		mensa['distance'] = calculateDistance({lat:mensa['coord_lat'],lon:mensa['coord_lon']}, {lat:location.lat,lon:location.lon});
 	
 		mensen.push(mensa);
 		
@@ -417,7 +418,12 @@ function listMensenByDistance(results,mensenliste,location){
 }
 
 
-
+function calculateDistance(mensalocation, devicelocation){
+	// calculate distance
+	var dx = 111.3 * Math.cos((devicelocation.lat + mensalocation.lat)/2*0.01745) * (devicelocation.lon - mensalocation.lon);
+	var dy = 111.3 * (devicelocation.lat - mensalocation.lat);
+	return roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
+}
 
 
 function mensenListTpl(data){
@@ -664,7 +670,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										DEBUG_MODE && console.log("no meals found");
 										$('#busy').fadeOut();
 										$('#blocker').hide();
-										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
+										//if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
 										speiseplan.append('<p class="blanktext">Für diesen Tag stehen (noch) keine Speiseplandaten zur Verfügung.</p>');
 										speiseplan.fadeIn('fast');
 										refreshScroll($('#speiseplan'),true);
@@ -674,29 +680,51 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										'OK' // buttonName
 										);
 									*/
-										return;
+									}
+								} else {
+					
+					
+						    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
+										getRecommendationsFromApi(mensaid, datestamp);
+									} 
+						
+						
+									for (var i = 0; i < len; i++) {
+										meal = results.rows.item(i);
+										speiseplan.prepend(mealListTpl(meal));
+						
+										if (i == len - 1) { // last loop
+											//if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
+											speiseplan.fadeIn(150);
+											jumpToElemOffset = 9;
+											if ($('#speiseplan #pullDown').hasClass('loading')) jumpToElemOffset = 9 + 40;
+						    				refreshScroll($('#speiseplan'),false,'.meal',jumpToElemOffset);
+						    				$('#busy').fadeOut();
+											$('#blocker').hide();
+										}
 									}
 								}
-					
-					
-					    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
-									getRecommendationsFromApi(mensaid, datestamp);
-								} 
-					
-					
-								for (var i = 0; i < len; i++) {
-									meal = results.rows.item(i);
-									speiseplan.prepend(mealListTpl(meal));
-					
-									if (i == len - 1) { // last loop
-										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
-										speiseplan.fadeIn(150);
-										jumpToElemOffset = 9;
-										if ($('#speiseplan #pullDown').hasClass('loading')) jumpToElemOffset = 9 + 40;
-					    				refreshScroll($('#speiseplan'),false,'.meal',jumpToElemOffset);
-					    				$('#busy').fadeOut();
-										$('#blocker').hide();
-									}
+								
+								if (mensa.checkinid != "" && datestamp == getDatestamp()) {
+									// get curren user position
+									navigator.geolocation.getCurrentPosition(
+										function(position){
+										// success
+											distance = calculateDistance({lat:mensa.coord_lat,lon:mensa.coord_lon}, {lat:position.coords.latitude,lon:position.coords.longitude});
+											console.log(distance);
+											if (distance < 10) speiseplan.prepend(checkinbutton);
+										},
+										function(error){
+										// error
+											speiseplan.prepend(checkinbutton);
+										},
+										// options
+										{
+											maximumAge: 60000,
+											timeout: 3000,
+											enableHighAccuracy: false
+										}
+									);
 								}
 					
 							}, dbError);
@@ -933,14 +961,17 @@ function getMealsFromApi(mensaid, datestamp) {
 		}
 		
 		if (results.error.key == "no_meals") {
-			$('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>').fadeIn(150);
+			//$('#speiseplan .content .mealwrapper').append('<p class="blanktext">'+msg+'</p>').fadeIn(150);
+			getMenu(mensaid, datestamp, false);
 			return;
 		}
-
+		
+		getMenu(mensaid, datestamp, false);
+		
 		navigator.notification.alert(msg, // message
-		alertDismissed, // callback
-		title, // title
-		'OK' // buttonName
+			alertDismissed, // callback
+			title, // title
+			'OK' // buttonName
 		);
 
 	});

@@ -581,41 +581,83 @@ function postrecommendation(mealid,datestamp){
 	$('#busy').fadeIn();
 	var url = 'http://mensaapp.de/recommendation/'+mealid+'/';
 	
-	timezoneOffset = (new Date().getTimezoneOffset()/60) * -1;
-	if (timezoneOffset > 0) { timezoneOffset = '+'+ pad(timezoneOffset,2);
-		} else { timezoneOffset = '-'+ pad(timezoneOffset*-1,2);}
-	var postobj = {meal: url, end_time: datestamp+'T16:00:00'+timezoneOffset+':00'};
-	//postobj['fb:explicitly_shared'] = true;
-
-	FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', postobj, function(response) {
-		DEBUG_MODE && console.log(response);
-		
-		if (!response || response.error) {
-			$('#busy').fadeOut();
-			if (response.error.code == 3501) {
-				// og action was already performed
-				return;
-			}
-			navigator.notification.alert(
-				"Es trat ein Fehler bei Facebook auf.",  // message
-				alertDismissed,         // callback
-				"Fehler",            // title
-				'OK'                  // buttonName
-			);
+	db.transaction(function(tx) {
+		tx.executeSql('SELECT * FROM Meals WHERE mealid = '+mealid , [],
+		function(tx, results){
 			
-		} else {
-			DEBUG_MODE && console.log('Recommendation post ID: ' + response.id);
-			api('/pushrecommendation?mealid='+mealid+'&action_id='+response.id, function(response){
-				DEBUG_MODE && console.log("successfull pushed recommendation");
-				$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
-				$('#busy').fadeOut();
+			if (results.rows.length == 1) {
+				var meal = results.rows.item(0);
+				mensaid = meal.mensaid;
+			} else {
+				mensaid = 0;
+			}
 				
+				DEBUG_MODE && console.log("request for mensa "+mensaid+" data.");
 				db.transaction(function(tx) {
-					tx.executeSql('UPDATE Meals SET recommendations=? WHERE mealid = ' + mealid, [response.recommendations]);
-				}, function(){}, function(){});
-			});
-		}
-	});
+				    tx.executeSql('SELECT * FROM Mensen WHERE mensaid = '+mensaid , [],
+				    function(tx, results){
+				    //success
+				    	
+						if (results.rows.length == 1) {
+							var mensa = results.rows.item(0);
+
+							timezoneOffset = (new Date().getTimezoneOffset()/60) * -1;
+							if (timezoneOffset > 0) { timezoneOffset = '+'+ pad(timezoneOffset,2);
+								} else { timezoneOffset = '-'+ pad(timezoneOffset*-1,2);}
+							var postobj = {meal: url, end_time: datestamp+'T16:00:00'+timezoneOffset+':00'};
+							//postobj['fb:explicitly_shared'] = true;
+							if (mensa.checkinid != "") postobj['place'] = mensa.checkinid;
+						
+							FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', postobj, function(response) {
+								DEBUG_MODE && console.log(response);
+								
+								if (!response || response.error) {
+									$('#busy').fadeOut();
+									if (response.error.code == 3501) {
+										// og action was already performed
+										return;
+									}
+									navigator.notification.alert(
+										"Es trat ein Fehler bei Facebook auf.",  // message
+										alertDismissed,         // callback
+										"Fehler",            // title
+										'OK'                  // buttonName
+									);
+									
+								} else {
+									DEBUG_MODE && console.log('Recommendation post ID: ' + response.id);
+									api('/pushrecommendation?mealid='+mealid+'&action_id='+response.id, function(response){
+										DEBUG_MODE && console.log("successfull pushed recommendation");
+										$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
+										$('#busy').fadeOut();
+										
+										db.transaction(function(tx) {
+											tx.executeSql('UPDATE Meals SET recommendations=? WHERE mealid = ' + mealid, [response.recommendations]);
+										}, function(){}, function(){});
+									});
+								}
+							});
+							
+						} else {
+							// mensa not found
+							// ...wired error, should not happen
+							$('#busy').fadeOut();
+							navigator.notification.alert(
+								"Es trat ein Fehler auf.",  // message
+								alertDismissed,         // callback
+								"Fehler",            // title
+								'OK'                  // buttonName
+							);
+							
+						}
+						
+					}, dbError);
+				}, dbError); // mensa
+				
+				
+		}, dbError);
+	}, dbError); // meal
+
 	
 }
 
