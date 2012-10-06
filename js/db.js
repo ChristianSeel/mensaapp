@@ -712,7 +712,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										// success
 											distance = calculateDistance({lat:mensa.coord_lat,lon:mensa.coord_lon}, {lat:position.coords.latitude,lon:position.coords.longitude});
 											console.log(distance);
-											if (distance < 10) speiseplan.prepend(checkinbutton);
+											if (distance < 5) speiseplan.prepend(checkinbutton);
 										},
 										function(error){
 										// error
