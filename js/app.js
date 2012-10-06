@@ -591,7 +591,6 @@ function postrecommendation(mealid,datestamp){
 		DEBUG_MODE && console.log(response);
 		
 		if (!response || response.error) {
-			cb();
 			$('#busy').fadeOut();
 			if (response.error.code == 3501) {
 				// og action was already performed
@@ -609,7 +608,6 @@ function postrecommendation(mealid,datestamp){
 			api('/pushrecommendation?mealid='+mealid+'&action_id='+response.id, function(response){
 				DEBUG_MODE && console.log("successfull pushed recommendation");
 				$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
-				cb();
 				$('#busy').fadeOut();
 				
 				db.transaction(function(tx) {
