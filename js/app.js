@@ -623,6 +623,7 @@ function postrecommendation(mealid,datestamp){
 
 function doMensaCheckin(mealid, mensaid) {
 	
+	$('#busy').fadeIn();
 	var mensaid = mensaid;
 	if (typeof mealid == "undefined") mealid = 0;
 	DEBUG_MODE && console.log("check-in for mealid "+ mealid + " at mensa "+ mensaid);
