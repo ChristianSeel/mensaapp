@@ -403,7 +403,7 @@ function listMensenByDistance(results,mensenliste,location){
 	var mlen = mensen.length;
 	for (var i=0; i<mlen; i++){
 		if (i > 49 || (mensen[i]['distance'] > 100 && i > 9) || i == (mlen - 1)) {
-			mensenliste.append('<div class="square linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur alphabetischen Liste</p></div></div>');
+			mensenliste.append('<div class="square linkToAbc"><div class="innerwrapper"><h3>Alle Mensen anzeigen</h3><p>Zur Städteübersicht</p></div></div>');
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
 			$('#blocker').hide();
@@ -646,7 +646,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				    	
 				    	}
 				    	
-				    	
+				    	var checkinbutton = '<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>';
 						// db request meals
 						db.transaction(function(tx) {
 							tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
@@ -664,6 +664,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										DEBUG_MODE && console.log("no meals found");
 										$('#busy').fadeOut();
 										$('#blocker').hide();
+										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
 										speiseplan.append('<p class="blanktext">Für diesen Tag stehen (noch) keine Speiseplandaten zur Verfügung.</p>');
 										speiseplan.fadeIn('fast');
 										refreshScroll($('#speiseplan'),true);
@@ -688,7 +689,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 									speiseplan.prepend(mealListTpl(meal));
 					
 									if (i == len - 1) { // last loop
-										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend('<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>');
+										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
 										speiseplan.fadeIn(150);
 					    				refreshScroll($('#speiseplan'),true);
 					    				$('#busy').fadeOut();

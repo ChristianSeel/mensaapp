@@ -585,7 +585,7 @@ function postrecommendation(mealid,datestamp){
 	if (timezoneOffset > 0) { timezoneOffset = '+'+ pad(timezoneOffset,2);
 		} else { timezoneOffset = '-'+ pad(timezoneOffset*-1,2);}
 	var postobj = {meal: url, end_time: datestamp+'T16:00:00'+timezoneOffset+':00'};
-	postobj['fb:explicitly_shared'] = true;
+	//postobj['fb:explicitly_shared'] = true;
 
 	FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', postobj, function(response) {
 		DEBUG_MODE && console.log(response);
