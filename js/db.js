@@ -458,7 +458,7 @@ function getMensaDetails(mensaid) {
 				
 				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank" class="gmap" style="background-image:url(http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false)"></a></div>');
 				
-				if (mensa.checkinid != "") $('#mensa-details .content').append('<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>');
+				if (mensa.checkinid != "") $('#mensa-details .content').append('<a data-mensaid="'+mensaid+'" class="mensacheckin bold button blue icon icon-checkin">Check-in via Facebook</a>');
 			} else {
 				// mensa not found
 				// ...wired error, should not happen
@@ -646,7 +646,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				    	
 				    	}
 				    	
-				    	var checkinbutton = '<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>';
+				    	var checkinbutton = '<a data-mensaid="'+mensaid+'" class="mensacheckin bold button blue icon icon-checkin">Check-in via Facebook</a>';
 						// db request meals
 						db.transaction(function(tx) {
 							tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {

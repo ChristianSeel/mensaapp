@@ -354,7 +354,7 @@ $(function(){
 	});
 	
 	
-	$('#mensacheckin').live("click",function(e){
+	$('.mensacheckin').live("click",function(e){
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("checkin into mensa "+mensaid);
