@@ -456,7 +456,7 @@ function getMensaDetails(mensaid) {
 					var href = 'http://maps.google.com/maps?q='+mensa.coord_lat+','+mensa.coord_lon+'';
 				}
 				
-				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank"><img class="fullwidth" src="http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false"  width="300" height="220" /></a></div>');
+				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank" class="gmap" style="background-image:url(http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false)"></a></div>');
 				
 				if (mensa.checkinid != "") $('#mensa-details .content').append('<a id="mensacheckin" data-mensaid="'+mensaid+'" class="bold button blue icon icon-checkin">Check-in via Facebook</a>');
 			} else {
@@ -691,7 +691,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 									if (i == len - 1) { // last loop
 										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
 										speiseplan.fadeIn(150);
-					    				refreshScroll($('#speiseplan'),true);
+					    				refreshScroll($('#speiseplan'),false,'.meal');
 					    				$('#busy').fadeOut();
 										$('#blocker').hide();
 									}

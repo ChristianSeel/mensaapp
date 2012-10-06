@@ -8,17 +8,23 @@
     var KEY_ISCROLL_OBJ = 'iscroll_object';
     
     
-    function refreshScroll($pane, jumpToTop) {	
+    function refreshScroll($pane, jumpToTop, jumpToElem) {	
     	if (typeof jumpToTop == "undefined") jumpToTop = false;
+    	if (typeof jumpToElem == "undefined") jumpToElem = false;
     	
     	$pane.find('.scrollwrapper').each(function (i, wrap) {
     		var $wrapper = $(wrap);
     		var scroll = $wrapper.data(KEY_ISCROLL_OBJ);
     		setTimeout(function () {
 				if (scroll !== undefined && scroll !== null) {
-	    			if (jumpToTop == true) {
-			    		scroll.scrollTo(0,0,500);
-		    			setTimeout(function(){scroll.refresh();},501);
+	    			if (jumpToTop === true) {
+	    				scroll.refresh();
+	    				scroll.scrollTo(0,0,500);
+			    		//scroll.scrollTo(0,0,500);
+		    			//setTimeout(function(){scroll.refresh();},501);
+	    			} else if (jumpToElem !== false) {
+	    				scroll.refresh();
+		    			scroll.scrollToElement(jumpToElem, 300, 9)
 	    			} else {
 		    			scroll.refresh();
 	    			}
