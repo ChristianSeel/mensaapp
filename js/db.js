@@ -691,7 +691,9 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 									if (i == len - 1) { // last loop
 										if (mensa.checkinid != "" && datestamp == getDatestamp()) speiseplan.prepend(checkinbutton);
 										speiseplan.fadeIn(150);
-					    				refreshScroll($('#speiseplan'),false,'.meal');
+										jumpToElemOffset = 9;
+										if ($('#speiseplan #pullDown').hasClass('loading')) jumpToElemOffset = 9 + 40;
+					    				refreshScroll($('#speiseplan'),false,'.meal',jumpToElemOffset);
 					    				$('#busy').fadeOut();
 										$('#blocker').hide();
 									}

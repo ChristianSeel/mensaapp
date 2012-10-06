@@ -8,7 +8,7 @@
     var KEY_ISCROLL_OBJ = 'iscroll_object';
     
     
-    function refreshScroll($pane, jumpToTop, jumpToElem) {	
+    function refreshScroll($pane, jumpToTop, jumpToElem, jumpToElemOffset) {	
     	if (typeof jumpToTop == "undefined") jumpToTop = false;
     	if (typeof jumpToElem == "undefined") jumpToElem = false;
     	
@@ -24,7 +24,7 @@
 		    			//setTimeout(function(){scroll.refresh();},501);
 	    			} else if (jumpToElem !== false) {
 	    				scroll.refresh();
-		    			scroll.scrollToElement(jumpToElem, 300, 9)
+		    			scroll.scrollToElement(jumpToElem, 300, jumpToElemOffset)
 	    			} else {
 		    			scroll.refresh();
 	    			}
