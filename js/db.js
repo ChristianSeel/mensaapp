@@ -365,6 +365,8 @@ function listMensenByOrg(results,mensenliste, listcitys, city){
 		
 
 		if (i == (len - 1)) {
+		
+			if (!city) mensenliste.append('<a href="mailto:support@mensaapp.de?subject='+ encodeURIComponent('Fehlende Mensa [MA1]') +'" class="bold button">Fehlt deine Mensa? Feedback senden!</a>');
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
 			$('#blocker').hide();
@@ -465,6 +467,8 @@ function getMensaDetails(mensaid) {
 				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank" class="gmap" style="background-image:url(http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false)"></a></div>');
 				
 				if (mensa.checkinid != "") $('#mensa-details .content').append('<a data-mensaid="'+mensaid+'" class="mensacheckin bold button blue icon icon-checkin">Check-in via Facebook</a>');
+				
+				$('#mensa-details .content').append('<a href="mailto:support@mensaapp.de?subject='+ encodeURIComponent('Falsche oder fehlende Daten bei '+mensa.name+' ('+mensa.mensaid+') [MA2]') +'" class="bold button">Falsche oder fehlende Daten? Feedback senden!</a>');
 			} else {
 				// mensa not found
 				// ...wired error, should not happen
@@ -720,7 +724,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										},
 										// options
 										{
-											maximumAge: 60000,
+											maximumAge: 30000,
 											timeout: 3000,
 											enableHighAccuracy: false
 										}
