@@ -39,16 +39,20 @@
 		<!-- Fastclick -->
 		<script type="text/javascript" src="js/fastclick.js"></script>
 		
+		<!-- Cache -->
+		<script type="text/javascript" src="js/lawnchair-0.6.1.min.js"></script>
+		<script type="text/javascript" src="js/lawnchair-query-0.6.1.js"></script>
+		
 		<!-- App -->
 		<script type="text/javascript" src="js/hash.js"></script>
-		<script type="text/javascript" src="js/db.js"></script>
+		<script type="text/javascript" src="js/cache.js"></script>
 		<script type="text/javascript" src="js/app.js"></script>
 		
 		<script type="text/javascript">
 			
 			var DEBUG_MODE = true;
-			var appversion = "0.9.10";
-			var requiredDBVersion = 43;
+			var appversion = "0.10.0";
+			var requiredCacheVersion = 1;
 			
 			var base_url = "http://mensaapp.de/";
 			var static_url = "http://static.mensaapp.de/";
@@ -62,11 +66,8 @@
 			
 			var fbuser = false;
 			var fbaccessToken = "";	
-				
-			var networkConnection;
-			var networkState = 0;
-			var db, googleAnalytics, uuid;
-			var devicePlatform = false;
+			
+			var cache = {}, networkConnection, networkState = 0, googleAnalytics, uuid, devicePlatform = false;
 			
 			var recommendations_refresh_interval = 60; // in seconds
 			

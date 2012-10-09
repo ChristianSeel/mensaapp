@@ -77,7 +77,7 @@ var app = {
 		
 				
 		// init database
-		setTimeout(initDB,500);
+		setTimeout(initCache,500);
 				
 	
 		// init facebook connect
