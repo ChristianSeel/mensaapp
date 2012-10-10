@@ -55,7 +55,8 @@ function createDBTables(tx) {
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Settings (key unique, val)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Mensen (mensaid unique, name, org, country, area, postal, city, address, lastcheck, lastcheck_string, lastcheck_recommendations, coord_lon, coord_lat, checkinid)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS FavoriteMensen (mensaid unique, isfavorite)');
-	tx.executeSql('CREATE TABLE IF NOT EXISTS Meals (mealid unique, datestamp, mensaid, name, label, price, info, recommendations)');
+	tx.executeSql('CREATE TABLE IF NOT EXISTS Meals (mealid unique, name, label, price, info, recommendations)');
+	tx.executeSql('CREATE TABLE IF NOT EXISTS MealMensa (mealid, mensaid, datestamp)');
 	tx.executeSql('CREATE TABLE IF NOT EXISTS Foodplans (key unique, mensaid, datestamp, trimmings)');
 	
 	tx.executeSql('INSERT OR IGNORE INTO Settings (key, val) VALUES ("lastupdate", 1)');
@@ -69,6 +70,7 @@ function dropDBTables(tx) {
 	tx.executeSql('DROP TABLE IF EXISTS Settings');
 	tx.executeSql('DROP TABLE IF EXISTS Mensen');
 	tx.executeSql('DROP TABLE IF EXISTS Meals');
+	tx.executeSql('DROP TABLE IF EXISTS MealMensa');
 	tx.executeSql('DROP TABLE IF EXISTS Foodplans');
 	DEBUG_MODE && console.log("[DB] db tables droped.");
 	//tx.executeSql('UPDATE Settings SET val = '+requiredDBVersion+' WHERE key = "dbVersion"');
@@ -191,7 +193,7 @@ function getMensenFromApi(listcitys) {
 					for (var k=0;k<mensaobj.length;k++) {
 						key = mensaobj[k];
 						if (typeof mensa[key] == "undefined") {
-							DEBUG_MODE && console.log(key + " is undefined for mensa " + mensa.mensaid);
+							//DEBUG_MODE && console.log(key + " is undefined for mensa " + mensa.mensaid);
 							mensa[key] = "";
 						}
 					}
@@ -655,7 +657,8 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				    	var checkinbutton = '<a data-mensaid="'+mensaid+'" class="mensacheckin bold button blue icon icon-checkin">Check-in via Facebook</a>';
 						// db request meals
 						db.transaction(function(tx) {
-							tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
+							tx.executeSql('SELECT Meals.* FROM Meals LEFT JOIN MealMensa ON Meals.mealid = MealMensa.mealid WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
+							//tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
 								// success function
 					
 								var len = results.rows.length;
@@ -829,11 +832,11 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 			// update lastcheck value
 			tx.executeSql('UPDATE Mensen SET lastcheck=?, lastcheck_string=?, lastcheck_recommendations=? WHERE mensaid = ' + mensaid, [results.mensa.lastcheck, results.mensa.lastcheck_string, getTimestamp()]);
 			
-			// remove old meals and inser new ones
-			tx.executeSql('DELETE FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"');
-			
 			for (var i = 0; i < results.days.length; i++) {
 				var foodplan = results.days[i];
+				
+				// remove old meals
+				tx.executeSql('DELETE FROM MealMensa WHERE mensaid = ' + mensaid + ' AND datestamp = "' + foodplan.datestamp + '"');
 				
 				// foodplan
 				foodplan.trimmings = JSON.stringify(foodplan.trimmings);
@@ -861,9 +864,11 @@ function getRecommendationsFromApi(mensaid, datestamp) {
 							meal[key] = "";
 						}
 					}
+					
+					tx.executeSql('INSERT OR IGNORE INTO MealMensa (mealid,mensaid,datestamp) VALUES (' + meal.mealid + ', '+mensaid+', "'+foodplan.datestamp+'" )');
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
-					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
+					tx.executeSql('UPDATE Meals SET name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
 					
 					$('[data-mealid="'+meal.mealid+'"] .recommendations .value').text(meal.recommendations);
 				}
@@ -898,17 +903,18 @@ function getMealsFromApi(mensaid, datestamp) {
 			// update lastcheck value
 			tx.executeSql('UPDATE Mensen SET lastcheck=?, lastcheck_string=?, lastcheck_recommendations=? WHERE mensaid = ' + mensaid, [results.mensa.lastcheck, results.mensa.lastcheck_string, getTimestamp()]);
 			
-			// remove old meals and inser new ones
-			tx.executeSql('DELETE FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '"');
 			
 			for (var i = 0; i < results.days.length; i++) {
 				var foodplan = results.days[i];
 				
+				// remove old meals
+				tx.executeSql('DELETE FROM MealMensa WHERE mensaid = ' + mensaid + ' AND datestamp = "' + foodplan.datestamp + '"');
+			
 				// foodplan
 				foodplan.trimmings = JSON.stringify(foodplan.trimmings);
 				tx.executeSql('INSERT OR IGNORE INTO Foodplans (key) VALUES ("' + mensaid + '-' + foodplan.datestamp + '")');
 				tx.executeSql('UPDATE Foodplans SET mensaid=?, datestamp=?, trimmings=? WHERE key = "' + mensaid + '-' + foodplan.datestamp + '"', [mensaid, foodplan.datestamp, foodplan.trimmings]);
-	
+				
 				// meals
 				for (var j = 0; j < foodplan.meals.length; j++) {
 					var meal = foodplan.meals[j];
@@ -930,9 +936,11 @@ function getMealsFromApi(mensaid, datestamp) {
 							meal[key] = "";
 						}
 					}
+					
+					tx.executeSql('INSERT OR IGNORE INTO MealMensa (mealid,mensaid,datestamp) VALUES (' + meal.mealid + ', '+mensaid+', "'+foodplan.datestamp+'" )');
 
 					tx.executeSql('INSERT OR IGNORE INTO Meals (mealid) VALUES (' + meal.mealid + ')');
-					tx.executeSql('UPDATE Meals SET datestamp=?, mensaid=?, name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [foodplan.datestamp, mensaid, meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
+					tx.executeSql('UPDATE Meals SET name=?, label=?, price=?, info=?, recommendations=? WHERE mealid=' + meal.mealid, [meal.name, meal.label, meal.price, meal.info, meal.recommendations]);
 				}
 			}
 
