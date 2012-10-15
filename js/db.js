@@ -319,7 +319,7 @@ function getMensenFromDB(listcitys,city){
 					// options
 					{
 						maximumAge: 5000,
-						timeout: 10000,
+						timeout: 6000,
 						enableHighAccuracy: false
 					}
 				);
@@ -420,12 +420,6 @@ function listMensenByDistance(results,mensenliste,location){
 }
 
 
-function calculateDistance(mensalocation, devicelocation){
-	// calculate distance
-	var dx = 111.3 * Math.cos((devicelocation.lat + mensalocation.lat)/2*0.01745) * (devicelocation.lon - mensalocation.lon);
-	var dy = 111.3 * (devicelocation.lat - mensalocation.lat);
-	return roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
-}
 
 
 function mensenListTpl(data){
@@ -715,7 +709,7 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										// success
 											distance = calculateDistance({lat:mensa.coord_lat,lon:mensa.coord_lon}, {lat:position.coords.latitude,lon:position.coords.longitude});
 											console.log(distance);
-											if (distance < 5) speiseplan.prepend(checkinbutton);
+											if (distance < 3) speiseplan.prepend(checkinbutton);
 										},
 										function(error){
 										// error

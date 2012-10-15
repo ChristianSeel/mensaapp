@@ -42,6 +42,8 @@ var app = {
 			DEBUG_MODE && console.log("Network state: "+networkState);
 		}
 		
+		refreshLocation();
+		
 		
 		// device uuid
 		uuid = DEBUG_MODE && device.uuid;
@@ -150,6 +152,7 @@ var app = {
 			DEBUG_MODE && console.log("Network state: "+networkState);
 		}
 		
+		refreshLocation();
 		getMensenFromDB(false);
 		cleanDB();
 		 
@@ -157,6 +160,28 @@ var app = {
 };
 
 
+
+function refreshLocation(callback){
+	if (callback == null) callback = function(){};
+	// get curren user position
+	navigator.geolocation.getCurrentPosition(
+	    function(position){
+	    // success
+	    	userlocation = {lat:position.coords.latitude,lon:position.coords.longitude,timestamp:getTimestamp()};
+	    	callback();
+	    },
+	    function(error){
+	    // error
+	    },
+	    // options
+	    {
+	    	maximumAge: 5000,
+			timeout: 6000,
+	    	enableHighAccuracy: false
+	    }
+	);
+
+}
 
 
 
@@ -494,12 +519,14 @@ $(function(){
 		
 		var mealwrapper = $(this).parent('.meal');
 		var mealid = mealwrapper.data('mealid');
+		var mensaid = $(this).parents('.content').find('.mensawrapper [data-mensaid]').data('mensaid');
 		var mealname = $('h2',mealwrapper).text();
 		var datestamp = $('#speiseplan').data('datestamp');
+		
 		navigator.notification.confirm(
 			'Möchtest du '+ mealname +' empfehlen?',  // message
 			function(index){
-				if (index==1) postrecommendation(mealid,datestamp);
+				if (index==1) postrecommendation(mealid,mensaid,datestamp);
 			},              // callback to invoke with index of button pressed
 			"Empfehlung veröffentlichen",            // title
 			'Empfehlen,Abbrechen'          // buttonLabels
@@ -575,11 +602,11 @@ function fbLogout(){
 
 	
 	
-function postrecommendation(mealid,datestamp){
+function postrecommendation(mealid,mensaid,datestamp){
 	
 	if (typeof datestamp == "undefined") datestamp = getDatestamp();
 	$('#busy').fadeIn();
-	var url = 'http://mensaapp.de/recommendation/'+mealid+'/';
+	var url = 'http://mensaapp.de/recommendation/'+mensaid+'/'+mealid+'/';
 	
 	db.transaction(function(tx) {
 		tx.executeSql('SELECT * FROM Meals WHERE mealid = '+mealid , [],
@@ -587,9 +614,8 @@ function postrecommendation(mealid,datestamp){
 			
 			if (results.rows.length == 1) {
 				var meal = results.rows.item(0);
-				mensaid = meal.mensaid;
 			} else {
-				mensaid = 0;
+				return false; // error should not happen
 			}
 				
 				DEBUG_MODE && console.log("request for mensa "+mensaid+" data.");
@@ -604,9 +630,14 @@ function postrecommendation(mealid,datestamp){
 							timezoneOffset = (new Date().getTimezoneOffset()/60) * -1;
 							if (timezoneOffset > 0) { timezoneOffset = '+'+ pad(timezoneOffset,2);
 								} else { timezoneOffset = '-'+ pad(timezoneOffset*-1,2);}
+							
 							var postobj = {meal: url, end_time: datestamp+'T16:00:00'+timezoneOffset+':00'};
 							//postobj['fb:explicitly_shared'] = true;
-							if (mensa.checkinid != "") postobj['place'] = mensa.checkinid;
+							
+							if (mensa.checkinid != "" && userlocation) {
+								distance = calculateDistance({lat:mensa.coord_lat,lon:mensa.coord_lon}, {lat:userlocation.lat,lon:userlocation.lon});
+								if (distance < 3) postobj['place'] = mensa.checkinid;
+							}
 						
 							FB.api('/'+fbuser.id+'/mensa_app:recommend', 'post', postobj, function(response) {
 								DEBUG_MODE && console.log(response);
@@ -626,7 +657,7 @@ function postrecommendation(mealid,datestamp){
 									
 								} else {
 									DEBUG_MODE && console.log('Recommendation post ID: ' + response.id);
-									api('/pushrecommendation?mealid='+mealid+'&action_id='+response.id, function(response){
+									api('/pushrecommendation?&mensaid='+mensaid+'&mealid='+mealid+'&action_id='+response.id, function(response){
 										DEBUG_MODE && console.log("successfull pushed recommendation");
 										$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
 										$('#busy').fadeOut();
@@ -994,6 +1025,14 @@ function pad(num, size) {
 function squareit(number) {
    return number * number;
 }
+
+function calculateDistance(mensalocation, devicelocation){
+	// calculate distance
+	var dx = 111.3 * Math.cos((devicelocation.lat + mensalocation.lat)/2*0.01745) * (devicelocation.lon - mensalocation.lon);
+	var dy = 111.3 * (devicelocation.lat - mensalocation.lat);
+	return roundNumber(Math.sqrt( dx * dx + dy * dy ),2);
+}
+
 
 
 function abc(el) {
