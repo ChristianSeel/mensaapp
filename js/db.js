@@ -256,7 +256,7 @@ function getMensenFromDB(listcitys,city){
 	if (typeof city != "undefined" && city !== false) wherec = 'WHERE Mensen.city = "'+city+'" ';
 	if (listcitys && !city) {groupbyc = 'GROUP BY Mensen.city ORDER BY city ASC, name ASC ';} else if (listcitys) {groupbyc = 'ORDER BY name ASC'} else {groupbyc = 'ORDER BY org ASC, name ASC'}
 	var query = 'SELECT * FROM Mensen LEFT OUTER JOIN FavoriteMensen ON Mensen.mensaid = FavoriteMensen.mensaid '+wherec+groupbyc+'';
-	console.log(query);
+	DEBUG_MODE && console.log(query);
 	
 	db.transaction(function(tx) {
 	 //   tx.executeSql('SELECT * FROM Mensen ORDER BY org ASC, name ASC' , [],
@@ -708,7 +708,6 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										function(position){
 										// success
 											distance = calculateDistance({lat:mensa.coord_lat,lon:mensa.coord_lon}, {lat:position.coords.latitude,lon:position.coords.longitude});
-											console.log(distance);
 											if (distance < 3) speiseplan.prepend(checkinbutton);
 										},
 										function(error){
@@ -986,13 +985,15 @@ function getMealsFromApi(mensaid, datestamp) {
 
 function cleanDB(){
 	DEBUG_MODE && console.log("[DB] Cleaning");
-	//nextdatestamp = getDatestamp(AddDays(Datestamp2Date(getDatestamp()),7));
 	nextdatestamp = getDatestamp();
-	console.log("[DB] Cleaning Meals older than "+nextdatestamp);
+	DEBUG_MODE && console.log("[DB] Cleaning Meals older than "+nextdatestamp);
 	
 	db.transaction(function(tx) {
-		tx.executeSql('DELETE FROM Meals WHERE datestamp < "' + nextdatestamp + '"');
+		tx.executeSql('DELETE FROM MealMensa WHERE datestamp < "' + nextdatestamp + '"');
 		tx.executeSql('DELETE FROM Foodplans WHERE datestamp < "' + nextdatestamp + '"');
+
+		// delete all meals that are not in the MealMensa table
+		tx.executeSql('DELETE FROM Meals WHERE NOT EXISTS (SELECT NULL FROM MealMensa WHERE Meals.mealid = MealMensa.mealid)');
 	});
 	
 }

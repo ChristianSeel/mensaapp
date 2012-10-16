@@ -276,7 +276,7 @@ $(function(){
 	// scroll to top
 	$('.navigationbar h1, #header .wrapper, #header h1').live("click",function(e) {
 		e.preventDefault();
-		console.log("scrollToTop triggered!");
+		DEBUG_MODE && console.log("scrollToTop triggered!");
 		var scroll = $('#jqt > .current .scrollwrapper').data(KEY_ISCROLL_OBJ);
 		scroll.scrollTo(0,0,350);
 	});
@@ -753,7 +753,7 @@ function doMensaCheckin(mealid, mensaid) {
 								
 							}
 							
-							console.log('process checkin with message "'+postmessage+'" at location id '+mensa.checkinid);
+							DEBUG_MODE && console.log('process checkin with message "'+postmessage+'" at location id '+mensa.checkinid);
 
 							
 							FB.api('/'+fbuser.id+'/feed', 'post', {message: postmessage, place: mensa.checkinid}, function(response) {
