@@ -648,8 +648,22 @@ function postrecommendation(mealid,mensaid,datestamp){
 										// og action was already performed
 										return;
 									}
+									
+									if (response.error.code >= 200 && response.error.code < 300) {
+										// permission error
+										navigator.notification.confirm(
+											'Für diese Aktion hast du nicht alle notwendigen Berechtigungen auf Facebook gegeben. Bitte logge dich erneut ein und erteile alle Berechtigungen.',  // message
+											function(index){
+												if (index==1) fbLogin();
+											},              // callback to invoke with index of button pressed
+											"Fehlende Berechtigungen",            // title
+											'Login,Abbrechen'          // buttonLabels
+										);
+										return;
+									}
+									
 									navigator.notification.alert(
-										"Es trat ein Fehler bei Facebook auf.",  // message
+										"Es trat ein Fehler bei Facebook auf. (Code "+response.error.code+")",  // message
 										alertDismissed,         // callback
 										"Fehler",            // title
 										'OK'                  // buttonName
@@ -747,6 +761,20 @@ function doMensaCheckin(mealid, mensaid) {
 								
 								$('#busy').fadeOut();
 								if (!response || response.error) {
+									
+									if (response.error.code >= 200 && response.error.code < 300) {
+										// permission error
+										navigator.notification.confirm(
+											'Für diese Aktion hast du nicht alle notwendigen Berechtigungen auf Facebook gegeben. Bitte logge dich erneut ein und erteile alle Berechtigungen.',  // message
+											function(index){
+												if (index==1) fbLogin();
+											},              // callback to invoke with index of button pressed
+											"Fehlende Berechtigungen",            // title
+											'Login,Abbrechen'          // buttonLabels
+										);
+										return;
+									}
+
 									navigator.notification.alert(
 										"Es trat ein Fehler bei Facebook auf.",  // message
 										alertDismissed,         // callback
