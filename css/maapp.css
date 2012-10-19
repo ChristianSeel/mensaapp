@@ -101,6 +101,7 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .button.icon{padding-left:38px}
 .button.icon:after{content:"";display:block;position:absolute;top:0;left:0;width:38px;height:100%;background:transparent center center no-repeat;-webkit-background-size:20px;-moz-background-size:20px;-o-background-size:20px;-ms-background-size:20px;background-size:20px}
 .button.icon.icon-checkin:after{background-image:url("../img/icon-checkin.png")}
+.button.icon.icon-question:after{background-image:url("../img/icon-question.png")}
 .innerwrapper{padding:8px 15px;line-height:1.5}
 .smallinnerwrapper{padding:5px 15px;line-height:1.5}
 .square.error{-webkit-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);-moz-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);-o-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);-ms-box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3);box-shadow:0 0 15px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.13),0 0 5px rgba(255,0,0,0.3)}

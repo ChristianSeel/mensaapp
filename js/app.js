@@ -676,6 +676,10 @@ function postrecommendation(mealid,mensaid,datestamp){
 										$('[data-mealid="'+mealid+'"] .recommendations .value').text(response.recommendations);
 										$('#busy').fadeOut();
 										
+										if (!DEBUG_MODE) {
+											googleAnalytics.trackEvent("Recommendation", "Mensa " + mensaid, "Meal " + mealid);
+										}
+								
 										db.transaction(function(tx) {
 											tx.executeSql('UPDATE Meals SET recommendations=? WHERE mealid = ' + mealid, [response.recommendations]);
 										}, function(){}, function(){});
@@ -784,6 +788,11 @@ function doMensaCheckin(mealid, mensaid) {
 									
 								} else {
 									DEBUG_MODE && console.log('Post ID: ' + response.id);
+									
+									if (!DEBUG_MODE) {
+										googleAnalytics.trackEvent("Check-in", "Mensa " + mensaid, "Meal " + mealid);
+									}
+									
 									navigator.notification.alert(
 										"Dein Check-in wurde auf Facebook veröffentlicht.",  // message
 										alertDismissed,         // callback

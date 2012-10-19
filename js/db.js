@@ -225,7 +225,9 @@ function getMensenFromApi(listcitys) {
 		DEBUG_MODE && console.log(results);
 		
 		if (results.error.title) {var title = results.error.title + "";} else {var title = "Fehler";}
-		if (results.error.description) {var msg = results.error.description + "";} else {var msg = "Die verfügbaren Mensen konnten nicht vom Server abgerufen werden.";}
+		if (results.error.description) {var msg = results.error.description + "";} else {var msg = "Mensen konnten nicht vom Server abgerufen werden.";}
+		
+		if ($('#mensen #pulldown').hasClass('loading')) refreshScroll($('#mensen'), false);
 		
 		navigator.notification.alert(
 		    msg,  // message
@@ -367,6 +369,7 @@ function listMensenByOrg(results,mensenliste, listcitys, city){
 		
 
 		if (i == (len - 1)) {
+			if (!city) mensenliste.append('<a href="mailto:support@mensaapp.de?subject='+ encodeURIComponent('Fehlende Mensa [MA1]') +'" class="bold button icon icon-question">Fehlt deine Mensa? Sag Bescheid!</a>');
 			refreshScroll($('#mensen'), true);
 			$('#busy').fadeOut();
 			$('#blocker').hide();
@@ -459,6 +462,8 @@ function getMensaDetails(mensaid) {
 				}
 				
 				$('#mensa-details .content').append('<div class="square"><a href="'+href+'" target="_blank" class="gmap" style="background-image:url(http://maps.googleapis.com/maps/api/staticmap?center='+mensa.coord_lat+','+mensa.coord_lon+'&zoom=16&markers=icon:http://mensaapp.de/assets/images/icon-mappin4.png|color:red|'+mensa.coord_lat+','+mensa.coord_lon+'&size=600x440&sensor=false)"></a></div>');
+				
+				$('#mensa-details .content').append('<a href="mailto:support@mensaapp.de?subject='+ encodeURIComponent('Falsche oder fehlende Daten bei '+mensa.name+' ('+mensa.mensaid+') [MA2]') +'" class="bold button icon icon-question">Falsche oder fehlende Daten? Sag Bescheid!</a>');
 				
 				if (mensa.checkinid != "") $('#mensa-details .content').append('<a data-mensaid="'+mensaid+'" class="mensacheckin bold button blue icon icon-checkin">Check-in via Facebook</a>');
 			} else {
@@ -722,6 +727,11 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 										}
 									);
 								}
+								
+								
+								if (!DEBUG_MODE) {
+									googleAnalytics.trackEvent("Foodplan", "Mensa " + mensaid, datestamp);
+								}
 					
 							}, dbError);
 						}, dbError); // db request meals
@@ -947,6 +957,7 @@ function getMealsFromApi(mensaid, datestamp) {
 		//fail
 		DEBUG_MODE && console.log("meals update failed");
 		DEBUG_MODE && console.log(results);
+		
 		$('#busy').fadeOut();
 		$('#blocker').hide();
 		
