@@ -919,7 +919,9 @@ function api(url, success, fail) {
 	DEBUG_MODE && console.log("api request: "+url);
 	
 	if (url.indexOf("?") == -1) url += "?";
-	url += "&ma_hash="+hash.gen("enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion+"&fbuid="+fbuser.id);
+	var hash = "enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion;
+	if (fbuser) hash += "&fbuid="+fbuser.id;
+	url += "&ma_hash="+hash.gen();
 		
 	
 	$.getJSONP({
