@@ -398,7 +398,7 @@ $(function(){
 		
 		
 		db.transaction(function(tx) {
-		    tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + getDatestamp() + '" ORDER BY recommendations ASC, label DESC, mealid DESC' , [],
+			tx.executeSql('SELECT Meals.* FROM Meals LEFT JOIN MealMensa ON Meals.mealid = MealMensa.mealid WHERE mensaid = ' + mensaid + ' AND datestamp = "' + getDatestamp() + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
 		    function(tx, results){
 		    //success
 		    	
@@ -715,8 +715,10 @@ function postrecommendation(mealid,mensaid,datestamp){
 function doMensaCheckin(mealid, mensaid) {
 	
 	$('#busy').fadeIn();
-	var mensaid = mensaid;
 	if (typeof mealid == "undefined") mealid = 0;
+	if (typeof mensaid == "undefined") {
+		alert("no mensaid given"); return;
+	}
 	DEBUG_MODE && console.log("check-in for mealid "+ mealid + " at mensa "+ mensaid);
 	
 	
@@ -724,9 +726,8 @@ function doMensaCheckin(mealid, mensaid) {
 		tx.executeSql('SELECT * FROM Meals WHERE mealid = '+mealid , [],
 		function(tx, results){
 			
-			if (results.rows.length == 1) {
+			if (results.rows.length > 0) {
 				var meal = results.rows.item(0);
-				mensaid = meal.mensaid;
 			}
 				
 				DEBUG_MODE && console.log("request for mensa "+mensaid+" data.");
@@ -919,9 +920,9 @@ function api(url, success, fail) {
 	DEBUG_MODE && console.log("api request: "+url);
 	
 	if (url.indexOf("?") == -1) url += "?";
-	var hash = "enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion;
-	if (fbuser) hash += "&fbuid="+fbuser.id;
-	url += "&ma_hash="+hash.gen();
+	var hashvalue = "enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion;
+	if (fbuser) hashvalue += "&fbuid="+fbuser.id;
+	url += "&ma_hash="+hash.gen(hashvalue);
 		
 	
 	$.getJSONP({

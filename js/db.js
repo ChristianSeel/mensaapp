@@ -654,10 +654,10 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 				    	}
 				    	
 				    	var checkinbutton = '<a data-mensaid="'+mensaid+'" class="mensacheckin bold button blue icon icon-checkin">Check-in via Facebook</a>';
+				    	
 						// db request meals
 						db.transaction(function(tx) {
 							tx.executeSql('SELECT Meals.* FROM Meals LEFT JOIN MealMensa ON Meals.mealid = MealMensa.mealid WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
-							//tx.executeSql('SELECT * FROM Meals WHERE mensaid = ' + mensaid + ' AND datestamp = "' + datestamp + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
 								// success function
 					
 								var len = results.rows.length;
