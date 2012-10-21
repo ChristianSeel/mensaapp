@@ -396,9 +396,9 @@ $(function(){
 			return false;
 		}	
 		
-		
+	
 		db.transaction(function(tx) {
-			tx.executeSql('SELECT Meals.* FROM Meals LEFT JOIN MealMensa ON Meals.mealid = MealMensa.mealid WHERE mensaid = ' + mensaid + ' AND datestamp = "' + getDatestamp() + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [], function(tx, results) {
+			tx.executeSql('SELECT Meals.* FROM Meals LEFT JOIN MealMensa ON Meals.mealid = MealMensa.mealid WHERE mensaid = ' + mensaid + ' AND datestamp = "' + getDatestamp() + '" ORDER BY recommendations ASC, label DESC, mealid DESC', [],
 		    function(tx, results){
 		    //success
 		    	
@@ -412,7 +412,7 @@ $(function(){
 					$('#selectmeal ul').html('');
 					for (var i = 0; i < len; i++) {
 						meal = results.rows.item(i);
-						$('#selectmeal ul').append('<li data-mealid="'+meal.mealid+'">'+meal.name+'</li>');
+						$('#selectmeal ul').append('<li data-mealid="'+meal.mealid+'" data-mensaid="'+mensaid+'">'+meal.name+'</li>');
 		
 						if (i == len - 1) { // last loop
 							$('#selectmeal ul').append('<li data-mealdid="0" data-mensaid="'+mensaid+'" class="bold">Check-in ohne weitere Angaben</li>');
@@ -683,7 +683,22 @@ function postrecommendation(mealid,mensaid,datestamp){
 										db.transaction(function(tx) {
 											tx.executeSql('UPDATE Meals SET recommendations=? WHERE mealid = ' + mealid, [response.recommendations]);
 										}, function(){}, function(){});
+									}, function(response){
+	
+										DEBUG_MODE && console.log(response);
+										if (response.error.title) {var title = response.error.title + "";} else {var title = "Fehler";}
+										if (response.error.description) {var msg = response.error.description + "";} else {var msg = "Deine Empfehlung wurde zwar auf Facebook veröffentlicht, konnte jedoch nicht auf unseren Servern gespeichert werden.";}
+										
+										$('#busy').fadeOut();
+										
+										navigator.notification.alert(
+										    msg,  // message
+										    alertDismissed,         // callback
+										    title,            // title
+										    'OK'                  // buttonName
+										);		
 									});
+									
 								}
 							});
 							
@@ -717,7 +732,7 @@ function doMensaCheckin(mealid, mensaid) {
 	$('#busy').fadeIn();
 	if (typeof mealid == "undefined") mealid = 0;
 	if (typeof mensaid == "undefined") {
-		alert("no mensaid given"); return;
+		return;
 	}
 	DEBUG_MODE && console.log("check-in for mealid "+ mealid + " at mensa "+ mensaid);
 	
@@ -923,8 +938,7 @@ function api(url, success, fail) {
 	var hashvalue = "enviroment=mobile&platform="+device.platform+"&platformversion="+device.version+"&appversion="+appversion;
 	if (fbuser) hashvalue += "&fbuid="+fbuser.id;
 	url += "&ma_hash="+hash.gen(hashvalue);
-		
-	
+
 	$.getJSONP({
 			url: api_url+url,
 			cache: false,

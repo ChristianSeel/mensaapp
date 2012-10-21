@@ -73,7 +73,6 @@ function dropDBTables(tx) {
 	tx.executeSql('DROP TABLE IF EXISTS MealMensa');
 	tx.executeSql('DROP TABLE IF EXISTS Foodplans');
 	DEBUG_MODE && console.log("[DB] db tables droped.");
-	//tx.executeSql('UPDATE Settings SET val = '+requiredDBVersion+' WHERE key = "dbVersion"');
 }
 
 
