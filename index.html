@@ -9,20 +9,21 @@
 		<title>mensa.app</title>
 
 		<link rel="stylesheet" href="css/jqtouch.css" />
-<!--	<link rel="stylesheet" href="css/fontface.css" /> -->
+		<link rel="stylesheet" href="css/fontface.css" />
 		<link rel="stylesheet" href="css/maapp.css" />
 		
 	<!-- JAVASCRIPT -->	
 		<!-- Cordova -->
-		<script type="text/javascript" src="cordova-2.1.0.js"></script>
+		<!-- iOS  <script type="text/javascript" src="cordova-2.1.0-ios.js"></script>-->
+		<!-- Android --><script type="text/javascript" src="cordova-2.1.0-android.js"></script>
 		
 		<!-- facebook connect -->
 		<script type="text/javascript" src="cdv-plugin-fb-connect.js"></script>
 		<script type="text/javascript" src="facebook_js_sdk.js"></script>
 		
 		<!-- GoogleAnalyticsPlugin -->
-		<!-- iOS  --><script type="text/javascript" src="GoogleAnalyticsPlugin.js"></script>
-		<!-- Android <script type="text/javascript" src="analytics.js"></script>-->
+		<!-- iOS  <script type="text/javascript" src="GoogleAnalyticsPlugin.js"></script>-->
+		<!-- Android --><script type="text/javascript" src="analytics.js"></script>
 				
 		<!-- jQuery -->
 		<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
@@ -46,9 +47,9 @@
 		
 		<script type="text/javascript">
 			
-			var DEBUG_MODE = false;
+			var DEBUG_MODE = true;
 
-			var appversion = "1.0.0";
+			var appversion = "0.12.4";
 			var requiredDBVersion = 1;
 
 			var base_url = "http://mensaapp.de/";
@@ -97,7 +98,7 @@
 	<body>
 
 		<div id="fb-root"></div>
-		<div id="splashscreen"><div class="spinner"></div><span id="splashappversion"></span></div>
+		<div id="splashscreen" stlye="display:none"><div class="spinner"></div><span id="splashappversion"></span></div>
 		<div id="busy"><div class="wrapper"><div class="spinner"></div><span>Bitte warten...</span></div></div>
 		<div id="blocker"></div>
 		<div id="selectmeal">

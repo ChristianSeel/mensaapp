@@ -214,6 +214,7 @@ function getMensenFromApi(listcitys) {
 			DEBUG_MODE && console.log("no mensen returned by api");
 			$('#busy').fadeOut();
 			$('#blocker').hide();
+			hideSplashscreen();
 		}
 	  
 	}, function(results){
