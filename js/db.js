@@ -685,6 +685,11 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 									}
 								} else {
 					
+					
+						    		if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
+										getRecommendationsFromApi(mensaid, datestamp);
+									} 
+						
 						
 									for (var i = 0; i < len; i++) {
 										meal = results.rows.item(i);
@@ -700,12 +705,8 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 											$('#blocker').hide();
 										}
 									}
-									
-									if (lastcheck_recommendations < (getTimestamp() - recommendations_refresh_interval) && fetchFromApi == true && networkState==1) {
-										//getRecommendationsFromApi(mensaid, datestamp);
-									}
 								}
-								/*
+								
 								if (mensa.checkinid != "" && datestamp == getDatestamp()) {
 									// get curren user position
 									navigator.geolocation.getCurrentPosition(
@@ -731,7 +732,6 @@ function getMenu(mensaid, datestamp, fetchFromApi) {
 								if (!DEBUG_MODE) {
 									googleAnalytics.trackEvent("Foodplan", "Mensa " + mensaid, datestamp);
 								}
-								*/
 					
 							}, dbError);
 						}, dbError); // db request meals

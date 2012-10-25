@@ -68,7 +68,7 @@ var app = {
 				googleAnalytics.startTrackerWithAccountID("UA-34897325-1");
 			} else {
 				googleAnalytics = window.plugins.analytics;
-				googleAnalytics.start("UA-34897325-1", function(){DEBUG_MODE && console.log("Analytics: start success");}, function(){DEBUG_MODE && console.log("Analytics: start failure");});
+				googleAnalytics.start("UA-34897325-1", function(){/* success */}, function(){/* failure */ });
 			}
 			
 		}
@@ -323,6 +323,7 @@ $(function(){
 		e.preventDefault();
 		var mensaid = $(this).data('mensaid');
 		DEBUG_MODE && console.log("go to speiseplan "+mensaid);
+		$('#busy').show();
 		getMenu(mensaid, getDatestamp(), true);
 		setTimeout(function(){
 			DEBUG_MODE && console.log('goTo triggered');

@@ -123,7 +123,6 @@
 
         }
         function doNavigation(fromPage, toPage, animation, goingBack) {
-        	console.log("doNavigation");
 	        if (disableNavigation == true) return false;
             goingBack = goingBack ? goingBack : false;
 
@@ -169,7 +168,7 @@
 
                 // Trigger animations
                 $body.addClass('animating ' + is3d);
-                console.log("Trigger animations");
+
                 var lastScroll = window.pageYOffset;
 
                 // Position the incoming page so toolbar is at top of viewport regardless of scroll position on from page
@@ -286,7 +285,7 @@
 
         }
         function goTo(toPage, animation) {
-	        console.log("goTo");
+	        
             var fromPage = history[0].page;
 
             if (typeof animation === 'string') {
@@ -313,7 +312,6 @@
             if (doNavigation(fromPage, toPage, animation)) {
             	//disableNavigation = true;
             	//setTimeout(function(){disableNavigation = false}, 500);
-            	console.log("return publicObj");
                 return publicObj;
             } else {
                 warn('Could not animate pages.');

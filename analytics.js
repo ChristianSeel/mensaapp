@@ -34,7 +34,7 @@ Analytics.prototype.start = function(accountId, successCallback, failureCallback
  * @param successCallback	The success callback
  * @param failureCallback	The error callback 
  */
-Analytics.prototype.trackPageView = function(key, successCallback, failureCallback) {
+Analytics.prototype.trackPageview = function(key, successCallback, failureCallback) {
 	return cordova.exec(
 				successCallback,			
 				failureCallback,		
