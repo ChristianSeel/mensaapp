@@ -325,6 +325,7 @@ $(function(){
 		DEBUG_MODE && console.log("go to speiseplan "+mensaid);
 		getMenu(mensaid, getDatestamp(), true);
 		setTimeout(function(){
+			DEBUG_MODE && console.log('goTo triggered');
 			jQT.goTo("#speiseplan","slideleft");
 		}, 50);
 		
