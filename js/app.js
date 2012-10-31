@@ -58,6 +58,7 @@ var app = {
 		if (deviceVersion.length > 2) deviceVersion = deviceVersion.slice(0,2);
 		deviceVersion = Math.floor(deviceVersion+0);
 		$('body').addClass("platformv"+deviceVersion);
+
 		
 		
 				
@@ -152,6 +153,7 @@ var app = {
 			DEBUG_MODE && console.log("Network state: "+networkState);
 		}
 		
+		jQT.clearHistory();
 		refreshLocation();
 		getMensenFromDB(false);
 		cleanDB();

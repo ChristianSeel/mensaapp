@@ -92,6 +92,12 @@
                 id: page.attr('id')
             });
         }
+        
+        function clearHistory(){
+	        history=[];
+	        addPageToHistory($currentPage);
+	        return true;
+        }
 
         // Unfortunately, we can not assume the "tap" event
         // is being used for links, forms, etc.
@@ -750,6 +756,7 @@
             animations: animations,
             getOrientation: getOrientation,
             goBack: goBack,
+            clearHistory: clearHistory,
             insertPages: insertPages,
             goTo: goTo,
             history: history,
