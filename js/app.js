@@ -373,6 +373,7 @@ $(function(){
 		return false;
 	});
 	
+/*  ...old jquery-jqtouch bridge (not working for android)	
 	$('#mensa-details').bind("swipe",function(e,info) {
 		e.preventDefault();
 		DEBUG_MODE && console.log("swipe detected");
@@ -380,6 +381,12 @@ $(function(){
 		if (info.direction == "right") {
 			jQT.goBack();
 		}
+	});
+*/
+	
+	$('#mensa-details').bind("swiperight",function(e) {
+		DEBUG_MODE && console.log("swipe detected");
+		jQT.goBack();
 	});
 	
 	
@@ -493,6 +500,7 @@ $(function(){
 	});
 	
 	// swipe
+/*	...old jquery-jqtouch (not working for android)
 	$('#speiseplan').bind("swipe",function(e,info) {
 		e.preventDefault();
 		DEBUG_MODE && console.log("swipe detected");
@@ -502,6 +510,16 @@ $(function(){
 		} else if (info.direction == "right") {
 			$('#speiseplan .skipdayleft').trigger("click", [true]);
 		}
+	});
+*/	
+	$('#speiseplan').bind("swipeleft",function(e) {
+		DEBUG_MODE && console.log("This is a swipeleft");
+		$('#speiseplan .skipdayright').trigger("click");
+	});
+	
+	$('#speiseplan').bind("swiperight",function(e) {
+		DEBUG_MODE && console.log("This is a swiperight");
+		$('#speiseplan .skipdayleft').trigger("click", [true]);
 	});
 	
 	

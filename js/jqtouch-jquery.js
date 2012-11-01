@@ -159,7 +159,7 @@
             jQTSettings[i] = options[i];
         }
         
-        $(document).bind('ready', function() {
+ /*       $(document).bind('ready', function() {
             $('#jqt').bind(START_EVENT, touchStartHandler);  
         });
 
@@ -184,7 +184,7 @@
                 return $(this).trigger('tap');
             }
         };
-
+*/
         options.framework = $;
 
         var core = jQTouchCore(options);
