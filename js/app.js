@@ -496,7 +496,7 @@ $(function(){
 	$('#speiseplan').bind("swipe",function(e,info) {
 		e.preventDefault();
 		DEBUG_MODE && console.log("swipe detected");
-		
+
 		if (info.direction == "left") {
 			$('#speiseplan .skipdayright').trigger("click");
 		} else if (info.direction == "right") {

@@ -118,7 +118,6 @@ b, .bold, strong
 body, #splashscreen
 	background: #fff url(imagePath/background@2x.png) center center
 	background-size: 200px
-	background-attachment: fixed
 
 #splashscreen
 	z-index: 9999
@@ -810,3 +809,10 @@ body, #splashscreen
 body.android, body.ios.platformv4
 	.square, .square.gray, .button, .button.blue, .userimg
 		box-shadow: none
+
+
+body.android.platformv2
+	#splashscreen
+		background: #000
+		#splashappversion
+			color: #fff

@@ -24,7 +24,7 @@ b,.bold,strong{font-weight:600}
 .clearfix:after{clear:both}
 .links{float:left}
 .rechts{float:right}
-body,#splashscreen{background:#fff url("../img/background@2x.png") center center;-webkit-background-size:200px;-moz-background-size:200px;-o-background-size:200px;-ms-background-size:200px;background-size:200px;background-attachment:fixed}
+body,#splashscreen{background:#fff url("../img/background@2x.png") center center;-webkit-background-size:200px;-moz-background-size:200px;-o-background-size:200px;-ms-background-size:200px;background-size:200px}
 #splashscreen{z-index:9999;display:block;position:absolute;top:0;left:0;width:100%;height:100%;}
 #splashscreen #splashappversion{position:absolute;bottom:10px;right:10px;font-size:11px;color:#777}
 #splashscreen .spinnertext{color:#555;font-weight:600}
@@ -132,3 +132,5 @@ body,#splashscreen{background:#fff url("../img/background@2x.png") center center
 .gmap{display:block;width:100%;height:220px;-webkit-background-size:auto 100%;-moz-background-size:auto 100%;-o-background-size:auto 100%;-ms-background-size:auto 100%;background-size:auto 100%}
 .userimg{-webkit-border-radius:15px;-moz-border-radius:15px;-o-border-radius:15px;-ms-border-radius:15px;border-radius:15px;margin-right:15px;-webkit-box-shadow:0 0 5px rgba(0,0,0,0.1);-moz-box-shadow:0 0 5px rgba(0,0,0,0.1);-o-box-shadow:0 0 5px rgba(0,0,0,0.1);-ms-box-shadow:0 0 5px rgba(0,0,0,0.1);box-shadow:0 0 5px rgba(0,0,0,0.1)}
 body.android .square,body.ios.platformv4 .square,body.android .square.gray,body.ios.platformv4 .square.gray,body.android .button,body.ios.platformv4 .button,body.android .button.blue,body.ios.platformv4 .button.blue,body.android .userimg,body.ios.platformv4 .userimg{-webkit-box-shadow:none;-moz-box-shadow:none;-o-box-shadow:none;-ms-box-shadow:none;box-shadow:none}
+body.android.platformv2 #splashscreen{background:#000;}
+body.android.platformv2 #splashscreen #splashappversion{color:#fff}
